@@ -22,6 +22,8 @@ author see and feel the format before the rest of the book is written.
 ### My calls (change any of these)
 
 - **Working title:** *Second Home*.
+- **Author credit (author's choice):** "D.H." on the cover, with "Written by
+  Dina Helmy" on the title/credits line.
 - **Names:** Claire Whitmore (wife, narrator), Daniel Whitmore (husband,
   "travels for work"), Nora Vance (the other woman), two little girls with Nora.
 - **Setting:** A tidy commuter suburb outside Boston; Daniel's "work trips" are
