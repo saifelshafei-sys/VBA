@@ -6,7 +6,6 @@
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   // Blocks that always take a whole page to themselves
   var FULL = 'header.chapter-head, section.scene, section.ending, .phone, section.coldopen, main.cover';
-  var TURN_MS = 700;
 
   var blocks = [];
   Array.prototype.slice.call(body.children).forEach(function (el) {
@@ -105,48 +104,200 @@
     try { history.replaceState(null, '', '#p' + (cur + 1)); } catch (e) { /* hash is a convenience only */ }
   }
 
+  // ---- Page curl ----
+  // The turning page is clipped along a fold line, and the folded-over flap
+  // (the back of the paper) is drawn in an SVG overlay, reflected across that line.
+  // P is where the page's top-right corner has been pulled to: (W, 0) is flat,
+  // (-W, 0) is fully turned over the spine.
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  var overlay = document.createElementNS(SVGNS, 'svg');
+  overlay.setAttribute('class', 'curl');
+  overlay.setAttribute('aria-hidden', 'true');
+  overlay.innerHTML =
+    '<defs>' +
+    '<linearGradient id="curl-back" gradientUnits="userSpaceOnUse">' +
+    '<stop offset="0" stop-color="#5a3a62"/><stop offset="0.12" stop-color="#3e2245"/>' +
+    '<stop offset="0.6" stop-color="#2b1430"/><stop offset="1" stop-color="#1f0d23"/></linearGradient>' +
+    '<linearGradient id="curl-shade" gradientUnits="userSpaceOnUse">' +
+    '<stop offset="0" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>' +
+    '</defs>' +
+    '<polygon class="curl-shade" fill="url(#curl-shade)"/>' +
+    '<polygon class="curl-back" fill="url(#curl-back)"/>';
+  reader.appendChild(overlay);
+  var shadePoly = overlay.querySelector('.curl-shade');
+  var backPoly = overlay.querySelector('.curl-back');
+  var gBack = overlay.querySelector('#curl-back');
+  var gShade = overlay.querySelector('#curl-shade');
+
+  function size() {
+    var r = pages[cur].getBoundingClientRect();
+    return { W: r.width, H: r.height, left: r.left, top: r.top };
+  }
+
+  // Keep the side of the polygon where keep(pt) is true (Sutherland–Hodgman, one edge).
+  function clip(poly, f) {
+    var out = [];
+    for (var i = 0; i < poly.length; i++) {
+      var a = poly[i], b = poly[(i + 1) % poly.length];
+      var fa = f(a), fb = f(b);
+      if (fa >= 0) out.push(a);
+      if ((fa >= 0) !== (fb >= 0)) {
+        var t = fa / (fa - fb);
+        out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
+      }
+    }
+    return out;
+  }
+  function pts(poly) { return poly.map(function (p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' '); }
+
+  function draw(page, P, s) {
+    var W = s.W, H = s.H;
+    var dx = P[0] - W, dy = P[1];
+    var len = Math.sqrt(dx * dx + dy * dy);
+    if (len < 0.5) { clearCurl(page); return; }
+    var nx = dx / len, ny = dy / len;
+    var mx = (W + P[0]) / 2, my = P[1] / 2;
+    var side = function (p) { return (p[0] - mx) * nx + (p[1] - my) * ny; };
+    var rect = [[0, 0], [W, 0], [W, H], [0, H]];
+    var visible = clip(rect, side);
+    var flap = clip(rect, function (p) { return -side(p); });
+    page.style.clipPath = visible.length ? 'polygon(' + visible.map(function (p) { return p[0].toFixed(1) + 'px ' + p[1].toFixed(1) + 'px'; }).join(',') + ')' : 'polygon(0 0, 0 0, 0 0)';
+    var back = flap.map(function (p) {
+      var k = 2 * side(p);
+      return [p[0] - k * nx, p[1] - k * ny];
+    });
+    backPoly.setAttribute('points', pts(back));
+    shadePoly.setAttribute('points', pts(flap));
+    var L = Math.min(len, W) * 0.9;
+    gBack.setAttribute('x1', mx); gBack.setAttribute('y1', my);
+    gBack.setAttribute('x2', mx + nx * L); gBack.setAttribute('y2', my + ny * L);
+    gShade.setAttribute('x1', mx); gShade.setAttribute('y1', my);
+    gShade.setAttribute('x2', mx - nx * W * 0.35); gShade.setAttribute('y2', my - ny * W * 0.35);
+    overlay.style.display = 'block';
+  }
+  function clearCurl(page) {
+    if (page) page.style.clipPath = '';
+    overlay.style.display = 'none';
+  }
+
+  // The corner can't be pulled farther from the spine than the page is wide.
+  function limit(P, s) {
+    var d = Math.sqrt(P[0] * P[0] + P[1] * P[1]);
+    if (d > s.W) { P = [P[0] * s.W / d, P[1] * s.W / d]; }
+    return [P[0], Math.max(0, P[1])];
+  }
+
+  function animate(page, from, to, s, done) {
+    var dist = Math.abs(to[0] - from[0]) / (2 * s.W);
+    var dur = 250 + 650 * dist;
+    var t0 = null;
+    function frame(ts) {
+      if (t0 === null) t0 = ts;
+      var k = Math.min(1, (ts - t0) / dur);
+      var e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      var lift = Math.sin(Math.PI * e) * s.H * 0.32 * dist;
+      var P = limit([from[0] + (to[0] - from[0]) * e, from[1] + (to[1] - from[1]) * e + lift], s);
+      draw(page, P, s);
+      if (k < 1) requestAnimationFrame(frame); else done();
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function leaveChapter(forward) {
+    var url = body.getAttribute(forward ? 'data-next' : 'data-prev');
+    if (url) location.href = forward ? url : url + '#end';
+  }
+
+  function settle(page, under, keepUnder) {
+    clearCurl(page);
+    page.classList.remove('current', 'turning', 'under');
+    under.classList.remove('current', 'turning', 'under');
+    (keepUnder ? under : page).classList.add('current');
+    cur = pages.indexOf(keepUnder ? under : page);
+    busy = false;
+    remember();
+  }
+
+  // Start a turn: forward folds the current page away, backward unfolds the previous page over it.
+  function begin(forward) {
+    var n = forward ? cur + 1 : cur - 1;
+    if (n < 0 || n >= pages.length) return null;
+    var s = size();
+    var top = forward ? pages[cur] : pages[n];
+    var under = forward ? pages[n] : pages[cur];
+    top.classList.add('turning');
+    under.classList.add('under');
+    if (!forward) draw(top, [-s.W, 0], s);
+    return { forward: forward, top: top, under: under, s: s };
+  }
+
   function go(n) {
     if (busy || n === cur) return;
-    if (n < 0) {
-      var prev = body.getAttribute('data-prev');
-      if (prev) location.href = prev + '#end';
-      return;
-    }
-    if (n >= pages.length) {
-      var next = body.getAttribute('data-next');
-      if (next) location.href = next;
-      return;
-    }
-    var from = pages[cur], to = pages[n], forward = n > cur;
+    if (n < 0 || n >= pages.length) { leaveChapter(n >= pages.length); return; }
+    var forward = n > cur;
     if (reduced) {
-      from.classList.remove('current');
-      to.classList.add('current');
+      pages[cur].classList.remove('current');
+      pages[n].classList.add('current');
       cur = n;
       remember();
       return;
     }
     busy = true;
+    var t = begin(forward);
+    var W = t.s.W;
     if (forward) {
-      to.classList.add('under');
-      from.classList.add('turn-out');
+      animate(t.top, [W, 0], [-W, 0], t.s, function () { settle(t.top, t.under, true); });
     } else {
-      from.classList.add('under');
-      to.classList.add('turn-in');
+      animate(t.top, [-W, 0], [W, 0], t.s, function () { settle(t.top, t.under, false); });
     }
-    setTimeout(function () {
-      from.classList.remove('current', 'turn-out', 'under');
-      to.classList.remove('under', 'turn-in');
-      to.classList.add('current');
-      cur = n;
-      busy = false;
-      remember();
-    }, TURN_MS);
   }
 
-  // Tap the right side to go forward, the left side to go back. Links still work.
-  var swiped = false;
+  // Drag a page: the corner follows your finger. Tap: right side forward, left side back.
+  var drag = null, dragged = false;
+  reader.addEventListener('pointerdown', function (e) {
+    if (busy || e.button > 0 || e.target.closest('a, button')) return;
+    drag = { x: e.clientX, y: e.clientY, id: e.pointerId, turn: null };
+    dragged = false;
+  });
+  reader.addEventListener('pointermove', function (e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!drag.turn) {
+      if (Math.abs(dx) < 10 || Math.abs(dx) < Math.abs(dy)) return;
+      if (reduced) return;
+      drag.turn = begin(dx < 0);
+      if (!drag.turn) { drag = null; return; }
+      busy = true;
+      dragged = true;
+      try { reader.setPointerCapture(e.pointerId); } catch (err) { /* not needed */ }
+    }
+    var s = drag.turn.s, P;
+    if (drag.turn.forward) {
+      P = [s.W + dx * 1.6, Math.max(0, dy) * 0.6 + (-dx) * 0.08];
+    } else {
+      P = [-s.W + dx * 2.2, Math.max(0, dy) * 0.6 + Math.max(0, s.W - dx) * 0.04];
+    }
+    drag.P = limit(P, s);
+    draw(drag.turn.top, drag.P, s);
+  });
+  function endDrag(e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    var t = drag.turn, P = drag.P;
+    drag = null;
+    if (!t || !P) return;
+    var W = t.s.W;
+    var complete = t.forward ? P[0] < W * 0.55 : P[0] > -W * 0.45;
+    var target = (t.forward === complete) ? [-W, 0] : [W, 0];
+    animate(t.top, P, target, t.s, function () {
+      // forward+complete or backward+cancelled: the under page wins
+      settle(t.top, t.under, t.forward === complete);
+    });
+  }
+  reader.addEventListener('pointerup', endDrag);
+  reader.addEventListener('pointercancel', endDrag);
+
   reader.addEventListener('click', function (e) {
-    if (swiped) { swiped = false; return; }
+    if (dragged) { dragged = false; return; }
     var link = e.target.closest('a, button');
     if (link) {
       var href = link.getAttribute('href') || '';
@@ -158,24 +309,9 @@
       return;
     }
     if (window.getSelection && String(window.getSelection()).length) return;
-    var rect = reader.getBoundingClientRect();
-    go(e.clientX - rect.left > rect.width * 0.35 ? cur + 1 : cur - 1);
+    var s = size();
+    go(e.clientX - s.left > s.W * 0.35 ? cur + 1 : cur - 1);
   });
-
-  var sx = 0, sy = 0;
-  reader.addEventListener('touchstart', function (e) {
-    sx = e.changedTouches[0].clientX;
-    sy = e.changedTouches[0].clientY;
-  }, { passive: true });
-  reader.addEventListener('touchend', function (e) {
-    var dx = e.changedTouches[0].clientX - sx;
-    var dy = e.changedTouches[0].clientY - sy;
-    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3) {
-      swiped = true;
-      setTimeout(function () { swiped = false; }, 400);
-      go(dx < 0 ? cur + 1 : cur - 1);
-    }
-  }, { passive: true });
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(cur + 1); }

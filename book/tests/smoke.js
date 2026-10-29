@@ -81,7 +81,7 @@ function check(ok, msg) {
     check(info.over === 0, `${ch} no page overflows (${info.over} overflow)`);
     const before = await r.$$eval('.page', ps => ps.findIndex(p => p.classList.contains('current')));
     await r.keyboard.press('ArrowRight');
-    await r.waitForTimeout(900);
+    await r.waitForTimeout(1600);
     const after = await r.$$eval('.page', ps => ps.findIndex(p => p.classList.contains('current')));
     check(after === before + 1, `${ch} arrow key turns the page (${before} -> ${after})`);
     await r.close();
@@ -90,7 +90,7 @@ function check(ok, msg) {
   await last.goto('file://' + path.join(root, 'chapter-1.html') + '#end');
   await last.waitForSelector('.page.current');
   await last.waitForTimeout(300);
-  await Promise.all([last.waitForNavigation().catch(() => null), last.keyboard.press('ArrowRight')]);
+  await Promise.all([last.waitForNavigation({ timeout: 5000 }).catch(() => null), last.keyboard.press('ArrowRight')]);
   check(/chapter-2\.html(#p1)?$/.test(last.url()), `last page of chapter 1 turns into chapter 2 (${last.url().split('/').pop()})`);
 
   await browser.close();

@@ -317,12 +317,11 @@ body.paged { overflow: hidden; }
 .reader {
   position: fixed;
   inset: 0;
-  perspective: 2200px;
   background: radial-gradient(ellipse at 50% 50%, #241027, #07030a 80%);
   overflow: hidden;
   -webkit-user-select: none;
   user-select: none;
-  touch-action: pan-y;
+  touch-action: none;
 }
 .page {
   position: absolute;
@@ -351,27 +350,25 @@ body.paged { overflow: hidden; }
   pointer-events: none;
   z-index: 2;
 }
-/* Shading that darkens a page as it turns */
-.page::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to left, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.1));
-  opacity: 0;
-  pointer-events: none;
-  z-index: 3;
-}
 .reader.measuring .page { display: block; visibility: hidden; }
 .page.current { display: block; z-index: 2; }
 .page.under { display: block; z-index: 1; }
-.page.turn-out { display: block; z-index: 3; animation: turn-out 0.7s cubic-bezier(.45, .05, .55, .95) forwards; }
-.page.turn-out::after { animation: shade-in 0.7s ease forwards; }
-.page.turn-in { display: block; z-index: 3; animation: turn-in 0.7s cubic-bezier(.45, .05, .55, .95) forwards; }
-.page.turn-in::after { animation: shade-out 0.7s ease forwards; }
-@keyframes turn-out { from { transform: rotateY(0); } to { transform: rotateY(-100deg); } }
-@keyframes turn-in  { from { transform: rotateY(-100deg); } to { transform: rotateY(0); } }
-@keyframes shade-in  { to { opacity: 1; } }
-@keyframes shade-out { from { opacity: 1; } to { opacity: 0; } }
+.page.turning { display: block; z-index: 3; }
+.curl {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: min(100%, 680px);
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 4;
+  display: none;
+}
+.curl-back { filter: drop-shadow(-6px 4px 10px rgba(0, 0, 0, 0.55)); }
 
 .page-inner {
   position: absolute;
