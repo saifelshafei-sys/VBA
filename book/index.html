@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Second Home — Dina Helmy</title>
+<meta name="description" content="Second Home, a psychological thriller by Dina Helmy (D.H.).">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Oswald:wght@400;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Cold open: one line on black before the cover */
+  .coldopen {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 2rem 16px;
+    background: #000;
+    text-align: center;
+  }
+  .coldopen .line {
+    max-width: 30rem;
+    font-size: clamp(1.35rem, 5.4vw, 2rem);
+    line-height: 1.5;
+    font-style: italic;
+    margin: 0;
+  }
+  .coldopen .line .red { color: var(--blood); font-style: normal; font-family: var(--display); letter-spacing: 0.03em; }
+  .coldopen .down {
+    display: block;
+    margin-top: 3rem;
+    color: var(--muted);
+    font-family: var(--display);
+    letter-spacing: 0.3em;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    text-decoration: none;
+    animation: bob 2.4s ease-in-out infinite;
+  }
+  html.js .coldopen .down { opacity: 0; transition: opacity 1s; }
+  html.js .coldopen.done .down { opacity: 1; }
+  .caret { display: inline-block; width: 2px; height: 1em; background: var(--paper); vertical-align: -0.15em; margin-left: 2px; animation: blinkc 0.9s steps(1) infinite; }
+  @keyframes blinkc { 50% { opacity: 0; } }
+
+  /* The cover */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.6rem;
+    padding: 2rem 16px 3rem;
+    background: radial-gradient(ellipse at 50% 40%, #3b1240 0%, #000 75%);
+  }
+  .book {
+    position: relative;
+    width: min(420px, 100%);
+    aspect-ratio: 657 / 1024;
+    margin: 0;
+    overflow: hidden;
+    border-radius: 3px 6px 6px 3px;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.75);
+    background: #000;
+  }
+  .book img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: drift 22s ease-in-out infinite alternate;
+  }
+  @keyframes drift { from { transform: scale(1); } to { transform: scale(1.05) translate(-1%, -1%); } }
+
+  /* A bare bulb flickering in the room */
+  .book .flicker {
+    position: absolute;
+    inset: 0;
+    background: #000;
+    opacity: 0;
+    pointer-events: none;
+    animation: flicker 7s steps(1) 2s infinite;
+  }
+  @keyframes flicker {
+    0%, 70%, 72%, 73%, 100% { opacity: 0; }
+    71%   { opacity: 0.5; }
+    72.5% { opacity: 0.25; }
+  }
+
+  /* Fresh blood running down the wall */
+  .drip {
+    position: absolute;
+    top: var(--y);
+    left: var(--x);
+    width: var(--w, 4px);
+    height: 0;
+    border-radius: 0 0 4px 4px;
+    background: linear-gradient(rgba(110, 6, 16, 0.6), #8e0d18);
+    animation: run var(--d, 6s) cubic-bezier(.5, 0, .7, 1) var(--delay, 0s) infinite;
+  }
+  .drip::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -3px;
+    width: calc(var(--w, 4px) + 2px);
+    height: calc(var(--w, 4px) + 3px);
+    transform: translateX(-50%);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    background: #8e0d18;
+  }
+  @keyframes run {
+    0%   { height: 0; opacity: 0; }
+    8%   { opacity: 0.8; }
+    70%  { height: var(--h, 60px); opacity: 0.8; }
+    100% { height: var(--h, 60px); opacity: 0; }
+  }
+
+  /* With JS, the cover rises out of the dark once it is on screen */
+  html.js .book { opacity: 0; filter: brightness(0.2); transition: opacity 2.2s ease, filter 3s ease; }
+  html.js .cover.play .book { opacity: 1; filter: none; }
+  html.js .cover:not(.play) * { animation-play-state: paused; }
+
+  .begin {
+    display: inline-block;
+    padding: 0.85rem 2.2rem;
+    border: 1px solid var(--paper);
+    border-radius: 999px;
+    font-family: var(--display);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background 0.3s, color 0.3s;
+  }
+  .begin:hover, .begin:focus-visible { background: var(--paper); color: var(--night); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .drip { display: none; }
+    html.js .book { opacity: 1; filter: none; }
+  }
+</style>
+</head>
+<body>
+<section class="coldopen">
+  <div>
+    <p class="line" id="hook">By the time you finish reading this, my husband will be dead. <span class="red">And everyone will believe I'm the one who loved him.</span></p>
+    <a class="down" href="#cover">Scroll</a>
+  </div>
+</section>
+
+<main class="cover" id="cover">
+  <h1 class="book">
+    <img src="img/cover.jpg" alt="Second Home. A psychological thriller by Dina Helmy.">
+    <span class="flicker" aria-hidden="true"></span>
+    <span class="drip" aria-hidden="true" style="--x:76%;--y:57%;--w:2px;--h:42px;--d:8s;--delay:1.5s"></span>
+    <span class="drip" aria-hidden="true" style="--x:84%;--y:30%;--w:2px;--h:30px;--d:7s;--delay:4s"></span>
+    <span class="drip" aria-hidden="true" style="--x:65%;--y:63%;--w:1.5px;--h:22px;--d:9s;--delay:6s"></span>
+  </h1>
+  <a class="begin" href="chapter-1.html">Begin reading</a>
+</main>
+
+<script src="motion.js"></script>
+<script>
+  // Start the cover's intro once it is on screen.
+  (function () {
+    var cover = document.getElementById('cover');
+    if (!('IntersectionObserver' in window)) { cover.classList.add('play'); return; }
+    new IntersectionObserver(function (es, o) {
+      if (es[0].isIntersecting) { cover.classList.add('play'); o.disconnect(); }
+    }, { threshold: 0.35 }).observe(cover);
+  })();
+
+  // Type the cold-open line, then reveal the scroll cue.
+  (function () {
+    var box = document.querySelector('.coldopen');
+    var line = document.getElementById('hook');
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { box.classList.add('done'); return; }
+    var parts = Array.prototype.map.call(line.childNodes, function (n) { return { node: n, text: n.textContent }; });
+    parts.forEach(function (p) { p.node.textContent = ''; });
+    var caret = document.createElement('span');
+    caret.className = 'caret';
+    line.appendChild(caret);
+    var i = 0, j = 0;
+    setTimeout(function step() {
+      if (i >= parts.length) { box.classList.add('done'); return; }
+      var p = parts[i];
+      p.node.textContent = p.text.slice(0, ++j);
+      if (j >= p.text.length) { i++; j = 0; return setTimeout(step, 700); }
+      setTimeout(step, p.text[j - 1] === '.' || p.text[j - 1] === ',' ? 450 : 45);
+    }, 900);
+  })();
+</script>
+</body>
+</html>
