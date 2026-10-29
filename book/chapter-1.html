@@ -6,10 +6,16 @@
 <title>Chapter One — Second Home</title>
 <meta name="description" content="Second Home by D.H. (Dina Helmy). Chapter One: Claire.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Oswald:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Oswald:wght@400;600&display=swap">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="boil" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence data-boil type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1"/>
+    <feDisplacementMap in="SourceGraphic" scale="3"/>
+  </filter>
+</svg>
 
 <header class="chapter-head">
   <div>
@@ -42,9 +48,56 @@
 
 </article>
 
-<section class="scene" data-scene style="--img:url('img/scene-1.jpg')" aria-label="A phone glowing inside a gym bag">
-  <div class="scene-img" role="presentation"></div>
-  <div class="scene-flicker" aria-hidden="true"></div>
+<section class="scene" aria-label="Sketch: a phone glowing and buzzing inside a gym bag, a hand reaching for it">
+  <svg viewBox="0 0 400 380" data-sketch role="img" aria-hidden="true">
+    <g class="boil">
+      <!-- dryer top -->
+      <path class="ink thin" d="M10 330 L392 326"/>
+      <path class="ink hair" d="M14 337 L388 334"/>
+      <path class="ink hair" d="M30 352 L60 351 M90 350 L140 350 M300 348 L360 347"/>
+      <!-- bag body -->
+      <path class="ink" d="M60 322 C52 250 66 196 96 178 C150 160 260 158 312 176 C344 190 352 250 344 322 Z"/>
+      <path class="ink thin" d="M64 318 C58 252 70 200 99 183"/>
+      <!-- handles -->
+      <path class="ink" d="M140 172 C140 110 250 108 252 170"/>
+      <path class="ink thin" d="M150 172 C152 124 242 122 242 170"/>
+      <!-- zipper, half open -->
+      <path class="ink" d="M92 186 C150 200 250 200 314 182"/>
+      <path class="ink thin" d="M200 200 l2 -6 M215 199 l2 -6 M230 198 l2 -6 M245 196 l2 -6 M260 194 l2 -6 M275 191 l2 -6"/>
+      <path class="ink" d="M286 190 l12 18 l-10 4 z"/>
+      <!-- shading -->
+      <path class="ink hair" d="M300 230 l30 -20 M296 252 l40 -26 M294 274 l46 -30 M296 296 l46 -30 M304 314 l38 -24"/>
+      <path class="ink hair" d="M70 300 l14 -10 M70 314 l20 -14"/>
+      <!-- sock spilling out -->
+      <path class="ink thin" d="M262 184 C262 160 288 150 302 162 C308 170 298 180 288 176"/>
+      <!-- the phone -->
+      <g class="buzz">
+        <rect class="glow" x="124" y="166" width="54" height="70" rx="4"/>
+        <path class="ink" d="M118 250 L116 158 C116 152 120 148 126 148 L176 148 C182 148 186 152 186 158 L186 250"/>
+        <path class="ink thin" d="M124 166 L178 166 L178 240 L124 240 Z"/>
+        <path class="ink thin" d="M142 156 L160 156"/>
+        <path class="ink thin red" d="M130 182 L168 182 M130 192 L160 192 M130 206 L170 206 M130 216 L152 216"/>
+      </g>
+      <!-- side pocket, in front of the phone -->
+      <path class="ink occlude" d="M84 236 C120 228 176 228 206 236 L204 300 C170 306 120 306 86 300 Z"/>
+      <path class="ink thin" d="M88 243 C122 237 172 237 202 243"/>
+      <path class="ink hair" d="M96 290 l10 -8 M112 292 l12 -10 M180 292 l12 -10"/>
+      <!-- her hand reaching in from the left -->
+      <path class="ink" d="M0 104 C30 104 56 110 78 122 C86 126 96 128 104 126"/>
+      <path class="ink" d="M0 140 C26 140 50 144 70 150 C80 152 88 150 94 146"/>
+      <path class="ink thin" d="M104 126 C110 125 112 131 106 133 L92 136"/>
+      <path class="ink thin" d="M100 136 C108 136 110 142 102 144 L90 144"/>
+      <path class="ink thin" d="M94 146 C100 147 100 152 94 153 L84 152"/>
+      <path class="ink thin" d="M78 122 C80 112 90 108 98 112 C102 115 98 120 92 120"/>
+      <ellipse class="ink red" cx="86" cy="141" rx="2.5" ry="4.5"/>
+    </g>
+    <!-- buzz marks -->
+    <g class="flash">
+      <path class="ink red static" d="M104 160 l-14 -8 M102 178 l-16 0 M104 196 l-14 8"/>
+      <path class="ink red static" d="M198 160 l14 -8 M200 178 l16 0 M198 196 l14 8"/>
+    </g>
+    <text class="hand-note later" x="212" y="120" transform="rotate(-6 212 120)">3 new messages</text>
+  </svg>
   <p class="scene-line" data-reveal>It's a phone.</p>
 </section>
 
@@ -91,9 +144,46 @@
 
 </article>
 
-<section class="scene" data-scene style="--img:url('img/scene-2.jpg')" aria-label="A photo of two little girls on a porch">
-  <div class="scene-img" role="presentation"></div>
-  <div class="scene-flicker" aria-hidden="true"></div>
+<section class="scene" aria-label="Sketch: a phone in her hand showing two little girls in yellow raincoats on a porch">
+  <svg viewBox="0 0 400 420" data-sketch role="img" aria-hidden="true">
+    <g class="boil" transform="rotate(-5 200 210)">
+      <!-- phone -->
+      <path class="ink" d="M132 30 L268 30 C282 30 292 40 292 54 L292 368 C292 382 282 392 268 392 L132 392 C118 392 108 382 108 368 L108 54 C108 40 118 30 132 30 Z"/>
+      <path class="ink thin" d="M180 44 L220 44"/>
+      <path class="ink thin" d="M122 62 L278 62 L278 362 L122 362 Z"/>
+      <!-- the photo: house siding -->
+      <path class="ink hair" d="M122 80 L278 80 M122 98 L278 98 M122 116 L278 116 M122 134 L278 134 M122 152 L278 152 M122 170 L278 170 M122 188 L278 188 M122 206 L278 206"/>
+      <!-- window -->
+      <path class="ink thin" d="M150 92 L198 92 L198 150 L150 150 Z M174 92 L174 150 M150 121 L198 121"/>
+      <!-- porch post and door -->
+      <path class="ink thin" d="M248 72 L248 230 M256 72 L256 230"/>
+      <path class="ink thin" d="M210 100 L240 100 L240 214 L210 214"/>
+      <!-- steps -->
+      <path class="ink" d="M122 230 L278 230"/>
+      <path class="ink thin" d="M122 262 L278 262 M122 294 L278 294 M122 326 L278 326"/>
+      <path class="ink hair" d="M130 240 l20 0 M170 250 l30 0 M220 272 l26 0 M140 306 l24 0 M200 316 l40 0"/>
+      <!-- big sister -->
+      <path class="yellow" d="M172 210 C160 214 154 236 150 258 L194 258 C190 236 184 214 172 210 Z"/>
+      <path class="ink" d="M172 210 C160 214 154 236 150 258 L194 258 C190 236 184 214 172 210 Z"/>
+      <circle class="ink" cx="172" cy="200" r="10"/>
+      <path class="ink thin" d="M160 204 C158 186 186 186 184 204"/>
+      <path class="ink thin" d="M166 202 l2 0 M176 202 l2 0 M168 206 C171 209 174 209 177 206"/>
+      <path class="ink thin" d="M158 258 L156 274 M186 258 L188 274"/>
+      <!-- little sister -->
+      <path class="yellow" d="M222 222 C213 226 208 242 206 260 L238 260 C236 242 231 226 222 222 Z"/>
+      <path class="ink" d="M222 222 C213 226 208 242 206 260 L238 260 C236 242 231 226 222 222 Z"/>
+      <circle class="ink" cx="222" cy="214" r="8"/>
+      <path class="ink thin" d="M212 217 C210 202 234 202 232 217"/>
+      <path class="ink thin" d="M213 260 L212 274 M231 260 L232 274"/>
+      <!-- her thumb and fingers -->
+      <path class="ink" d="M60 420 C70 360 84 320 100 300 C112 288 128 292 128 306 C128 322 116 340 108 360"/>
+      <path class="ink thin" d="M112 296 C118 300 120 308 116 314"/>
+      <path class="ink" d="M292 150 C306 148 312 160 302 168 L292 170"/>
+      <path class="ink" d="M292 186 C308 184 314 198 302 206 L292 208"/>
+      <path class="ink" d="M292 224 C306 222 312 236 300 242 L292 244"/>
+      <path class="ink" d="M300 260 C330 300 340 360 344 420"/>
+    </g>
+  </svg>
   <p class="scene-line" data-reveal>Daddy.</p>
 </section>
 
@@ -106,10 +196,41 @@
   <p data-reveal>The microwave clock across the room glows green in the dark.</p>
 </article>
 
-<section class="scene" data-scene style="--img:url('img/scene-3.jpg')" aria-label="A microwave clock glowing 11:47 in a dark kitchen">
-  <div class="scene-img" role="presentation"></div>
-  <div class="scene-flicker" aria-hidden="true"></div>
-  <p class="clock" data-reveal>11:47</p>
+<section class="scene" aria-label="Sketch: a dark kitchen, a microwave clock glowing 11:47, a woman's silhouette in the doorway">
+  <svg viewBox="0 0 400 360" data-sketch role="img" aria-hidden="true">
+    <g class="boil">
+      <!-- doorway in the back -->
+      <path class="ink thin" d="M36 300 L36 52 L108 52 L108 300"/>
+      <path class="ink hair" d="M42 300 L42 58 L102 58 L102 300"/>
+      <!-- upper cabinets -->
+      <path class="ink thin" d="M140 30 L390 30 M140 120 L390 120 M140 30 L140 120 M222 30 L222 120 M306 30 L306 120 M390 30 L390 120"/>
+      <path class="ink hair" d="M210 70 l0 14 M234 70 l0 14 M294 70 l0 14 M318 70 l0 14"/>
+      <!-- counter -->
+      <path class="ink" d="M120 296 L398 292"/>
+      <path class="ink thin" d="M124 306 L396 302"/>
+      <path class="ink thin" d="M126 306 L126 360 M396 302 L396 360"/>
+      <!-- microwave -->
+      <path class="ink" d="M156 196 L352 194 L354 288 L156 290 Z"/>
+      <path class="ink thin" d="M170 208 L276 207 L276 276 L170 277 Z"/>
+      <path class="ink hair" d="M176 270 l40 -56 M190 272 l44 -60 M206 272 l46 -62 M224 272 l46 -62 M244 272 l30 -42"/>
+      <path class="ink thin" d="M266 222 L266 262"/>
+      <path class="ink thin" d="M288 212 L340 212 L340 236 L288 236 Z"/>
+      <circle class="ink hair" cx="298" cy="252" r="3"/><circle class="ink hair" cx="314" cy="252" r="3"/><circle class="ink hair" cx="330" cy="252" r="3"/>
+      <circle class="ink hair" cx="298" cy="266" r="3"/><circle class="ink hair" cx="314" cy="266" r="3"/><circle class="ink hair" cx="330" cy="266" r="3"/>
+      <!-- the dark: hatching on the walls -->
+      <path class="ink hair" d="M118 140 l20 -20 M118 160 l40 -40 M118 180 l38 -38 M118 200 l38 -38 M118 220 l36 -36 M118 240 l36 -36 M118 260 l36 -36 M118 280 l34 -34"/>
+      <path class="ink hair" d="M0 120 l30 -30 M0 150 l30 -30 M0 180 l30 -30 M0 210 l30 -30 M0 240 l30 -30 M0 270 l30 -30 M0 300 l30 -30"/>
+      <!-- green glow on the counter -->
+      <path class="ink thin green later" d="M270 300 C300 296 340 296 360 300"/>
+    </g>
+    <!-- someone standing in the doorway -->
+    <g class="figure">
+      <circle cx="72" cy="104" r="13" fill="#000"/>
+      <path d="M58 122 C64 116 80 116 86 122 L92 200 L86 300 L58 300 L52 200 Z" fill="#000"/>
+    </g>
+    <text class="lcd" x="314" y="230" text-anchor="middle" font-size="17">11:47</text>
+  </svg>
+  <p class="scene-line" data-reveal>I make a note of the time.</p>
 </section>
 
 <article>
@@ -199,9 +320,50 @@
 
 </article>
 
-<section class="scene" data-scene style="--img:url('img/scene-4.jpg')" aria-label="A woman's hands resting perfectly still beside a cup of tea">
-  <div class="scene-img" role="presentation"></div>
-  <div class="scene-flicker" aria-hidden="true"></div>
+<section class="scene" aria-label="Sketch: her hands resting perfectly still on the table beside a cup of tea and a phone lying face down">
+  <svg viewBox="0 0 400 400" data-sketch data-speed="0.8" role="img" aria-hidden="true">
+    <g class="boil">
+      <!-- table edge and grain -->
+      <path class="ink" d="M0 150 L400 146"/>
+      <path class="ink hair" d="M10 180 C80 176 140 186 200 180 M220 200 C280 196 330 204 390 198 M0 230 C60 226 90 234 130 230 M260 260 C310 256 350 262 400 258 M20 300 C60 296 80 302 100 300 M300 330 C340 326 370 332 400 330 M0 360 C40 356 60 362 90 360"/>
+      <!-- phone lying face down -->
+      <path class="ink" d="M34 176 L134 170 C140 170 144 174 144 180 L146 214 C146 220 142 224 136 224 L38 228 C32 228 28 224 28 218 L26 184 C26 178 30 176 34 176 Z"/>
+      <path class="ink hair" d="M40 220 l20 -42 M56 220 l20 -44 M72 220 l20 -44 M88 220 l20 -44 M104 218 l20 -44"/>
+      <circle class="ink thin" cx="122" cy="186" r="5"/>
+      <!-- teacup and saucer -->
+      <ellipse class="ink thin" cx="330" cy="256" rx="62" ry="15"/>
+      <path class="ink" d="M290 196 C292 230 302 252 330 254 C358 252 368 230 370 196"/>
+      <ellipse class="ink" cx="330" cy="196" rx="40" ry="9"/>
+      <path class="ink thin" d="M368 206 C390 204 392 230 366 232"/>
+      <path class="ink hair" d="M296 214 l10 30 M306 210 l8 36"/>
+      <!-- left hand -->
+      <path class="ink" d="M118 400 C122 370 126 346 134 326"/>
+      <path class="ink" d="M180 400 C178 372 176 352 178 334"/>
+      <path class="ink" d="M134 326 C130 318 128 308 130 298 C132 290 138 290 140 298 L140 302"/>
+      <path class="ink" d="M140 302 C139 284 140 268 143 252 C145 244 153 244 154 252 L154 296"/>
+      <path class="ink" d="M154 292 C154 272 155 256 157 242 C159 234 167 234 168 242 L168 292"/>
+      <path class="ink" d="M168 294 C169 276 170 262 172 250 C174 242 182 242 182 250 L180 298"/>
+      <path class="ink" d="M180 302 C181 290 182 282 185 272 C188 266 195 268 194 276 C192 292 186 314 178 334"/>
+      <path class="ink thin" d="M146 316 C154 320 166 320 172 316"/>
+      <path class="ink red" d="M168 270 L182 270"/>
+      <!-- right hand (mirror) -->
+      <g transform="translate(410 0) scale(-1 1)">
+        <path class="ink" d="M118 400 C122 370 126 346 134 326"/>
+        <path class="ink" d="M180 400 C178 372 176 352 178 334"/>
+        <path class="ink" d="M134 326 C130 318 128 308 130 298 C132 290 138 290 140 298 L140 302"/>
+        <path class="ink" d="M140 302 C139 284 140 268 143 252 C145 244 153 244 154 252 L154 296"/>
+        <path class="ink" d="M154 292 C154 272 155 256 157 242 C159 234 167 234 168 242 L168 292"/>
+        <path class="ink" d="M168 294 C169 276 170 262 172 250 C174 242 182 242 182 250 L180 298"/>
+        <path class="ink" d="M180 302 C181 290 182 282 185 272 C188 266 195 268 194 276 C192 292 186 314 178 334"/>
+        <path class="ink thin" d="M146 316 C154 320 166 320 172 316"/>
+      </g>
+    </g>
+    <!-- steam keeps rising after the drawing is done -->
+    <g class="later">
+      <path class="ink thin steam static" d="M316 186 C306 170 326 160 316 144 C308 130 324 120 318 104"/>
+      <path class="ink thin steam static" d="M336 186 C346 170 326 158 338 142 C346 128 332 118 340 100"/>
+    </g>
+  </svg>
   <p class="scene-line" data-reveal>They were the whole time.</p>
 </section>
 
@@ -229,5 +391,6 @@
 </nav>
 
 <script src="motion.js"></script>
+<script src="sketch.js"></script>
 </body>
 </html>

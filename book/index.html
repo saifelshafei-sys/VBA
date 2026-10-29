@@ -3,114 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Second Home — D.H.</title>
-<meta name="description" content="Second Home, a psychological thriller by D.H. (Dina Helmy).">
+<title>Second Home — Dina Helmy</title>
+<meta name="description" content="Second Home, a psychological thriller by Dina Helmy (D.H.).">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Oswald:wght@400;600&display=swap">
 <link rel="stylesheet" href="style.css">
 <style>
-  .cover {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    text-align: center;
-    padding: 2.5rem 16px 3rem;
-    background:
-      radial-gradient(ellipse at 50% 45%, #a43aa9 0%, var(--violet) 25%, var(--plum) 62%, var(--night) 100%);
-    overflow: hidden;
-    position: relative;
-  }
-  .kicker {
-    font-family: var(--display);
-    font-size: clamp(0.75rem, 2.6vw, 0.95rem);
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    margin: 0;
-    color: var(--paper);
-    opacity: 0;
-    animation: fade 1.4s ease 0.2s forwards;
-  }
-  .author {
-    font-family: var(--display);
-    font-weight: 600;
-    font-size: clamp(4rem, 22vw, 8rem);
-    line-height: 1;
-    letter-spacing: 0.12em;
-    margin: 0.5rem 0 0;
-    padding-left: 0.12em;
-    color: var(--paper);
-    opacity: 0;
-    animation: fade 1.6s ease 0.5s forwards;
-  }
-  .title {
-    position: relative;
-    font-family: var(--display);
-    font-weight: 600;
-    font-size: clamp(3.4rem, 17vw, 6.8rem);
-    line-height: 0.95;
-    margin: 0;
-    color: transparent;
-    letter-spacing: 0.03em;
-  }
-  .title::before, .title::after {
-    content: attr(data-text);
-    position: absolute;
-    inset: 0;
-    color: var(--blood);
-  }
-  /* The title cracks along a diagonal line */
-  .title::before {
-    clip-path: polygon(0 0, 100% 0, 100% 38%, 0 62%);
-    animation: crack-top 0.5s cubic-bezier(.3,1.6,.5,1) 3.2s forwards;
-  }
-  .title::after {
-    clip-path: polygon(0 64%, 100% 40%, 100% 100%, 0 100%);
-    animation: crack-bottom 0.5s cubic-bezier(.3,1.6,.5,1) 3.2s forwards;
-  }
-  @keyframes crack-top    { to { transform: translate(-4px, -3px) rotate(-0.6deg); } }
-  @keyframes crack-bottom { to { transform: translate(5px, 3px) rotate(0.5deg); } }
-  .title-wrap { opacity: 0; animation: fade 1s ease 2.4s forwards; }
-  .byline {
-    margin: 1.2rem 0 0;
-    font-style: italic;
-    color: var(--paper);
-  }
-  .begin {
-    display: inline-block;
-    margin-top: 1.8rem;
-    padding: 0.85rem 2.2rem;
-    border: 1px solid var(--paper);
-    border-radius: 999px;
-    font-family: var(--display);
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: background 0.3s, color 0.3s;
-  }
-  .cover-photo {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0;
-    animation: reveal-photo 3.5s ease 0.3s forwards, drift 24s ease-in-out 0.3s infinite alternate;
-  }
-  @keyframes reveal-photo { from { opacity: 0; filter: brightness(0.2); } to { opacity: 1; filter: none; } }
-  @keyframes drift { from { transform: scale(1.02); } to { transform: scale(1.1) translateY(-1.5%); } }
-  .cover { isolation: isolate; }
-  .cover::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: linear-gradient(to bottom, rgba(26,10,29,0.75) 0%, transparent 30%, transparent 55%, rgba(26,10,29,0.92) 100%);
-  }
-
   /* Cold open: one line on black before the cover */
   .coldopen {
     min-height: 100vh;
@@ -144,15 +42,102 @@
   .caret { display: inline-block; width: 2px; height: 1em; background: var(--paper); vertical-align: -0.15em; margin-left: 2px; animation: blinkc 0.9s steps(1) infinite; }
   @keyframes blinkc { 50% { opacity: 0; } }
 
+  /* The cover */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.6rem;
+    padding: 2rem 16px 3rem;
+    background: radial-gradient(ellipse at 50% 40%, #3b1240 0%, #000 75%);
+  }
+  .book {
+    position: relative;
+    width: min(420px, 100%);
+    aspect-ratio: 657 / 1024;
+    margin: 0;
+    overflow: hidden;
+    border-radius: 3px 6px 6px 3px;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.75);
+    background: #000;
+  }
+  .book img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: drift 22s ease-in-out infinite alternate;
+  }
+  @keyframes drift { from { transform: scale(1); } to { transform: scale(1.05) translate(-1%, -1%); } }
+
+  /* A bare bulb flickering in the room */
+  .book .flicker {
+    position: absolute;
+    inset: 0;
+    background: #000;
+    opacity: 0;
+    pointer-events: none;
+    animation: flicker 7s steps(1) 2s infinite;
+  }
+  @keyframes flicker {
+    0%, 70%, 72%, 73%, 100% { opacity: 0; }
+    71%   { opacity: 0.5; }
+    72.5% { opacity: 0.25; }
+  }
+
+  /* Fresh blood running down the wall */
+  .drip {
+    position: absolute;
+    top: var(--y);
+    left: var(--x);
+    width: var(--w, 4px);
+    height: 0;
+    border-radius: 0 0 4px 4px;
+    background: linear-gradient(rgba(110, 6, 16, 0.6), #8e0d18);
+    animation: run var(--d, 6s) cubic-bezier(.5, 0, .7, 1) var(--delay, 0s) infinite;
+  }
+  .drip::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -3px;
+    width: calc(var(--w, 4px) + 2px);
+    height: calc(var(--w, 4px) + 3px);
+    transform: translateX(-50%);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    background: #8e0d18;
+  }
+  @keyframes run {
+    0%   { height: 0; opacity: 0; }
+    8%   { opacity: 0.8; }
+    70%  { height: var(--h, 60px); opacity: 0.8; }
+    100% { height: var(--h, 60px); opacity: 0; }
+  }
+
+  /* With JS, the cover rises out of the dark once it is on screen */
+  html.js .book { opacity: 0; filter: brightness(0.2); transition: opacity 2.2s ease, filter 3s ease; }
+  html.js .cover.play .book { opacity: 1; filter: none; }
+  html.js .cover:not(.play) * { animation-play-state: paused; }
+
+  .begin {
+    display: inline-block;
+    padding: 0.85rem 2.2rem;
+    border: 1px solid var(--paper);
+    border-radius: 999px;
+    font-family: var(--display);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background 0.3s, color 0.3s;
+  }
   .begin:hover, .begin:focus-visible { background: var(--paper); color: var(--night); }
 
-  /* Without JS show the cover as a still; with JS hold the intro until the cover scrolls into view */
-  html:not(.js) .kicker, html:not(.js) .author, html:not(.js) .title-wrap, html:not(.js) .cover-photo { opacity: 1; animation: none; }
-  html.js .cover:not(.play) *, html.js .cover:not(.play) *::before, html.js .cover:not(.play) *::after { animation-play-state: paused; }
-
   @media (prefers-reduced-motion: reduce) {
-    .kicker, .author, .title-wrap, .cover-photo { opacity: 1; }
-    .coldopen .line { visibility: visible; }
+    .drip { display: none; }
+    html.js .book { opacity: 1; filter: none; }
   }
 </style>
 </head>
@@ -165,21 +150,16 @@
 </section>
 
 <main class="cover" id="cover">
-  <header>
-    <p class="kicker">A psychological thriller</p>
-    <p class="author" aria-label="D.H.">D.H.</p>
-  </header>
-
-  <img class="cover-photo" src="img/cover.jpg" alt="" onerror="this.onerror=null;this.src='https://d8j0ntlcm91z4.cloudfront.net/user_2zOvHxALbu7dcd2kTtVRb8rfFKa/hf_20261029_182643_2029db50-754e-4665-9feb-a133cec99464.png'">
-
-  <footer>
-    <div class="title-wrap">
-      <h1 class="title" data-text="SECOND HOME">SECOND HOME</h1>
-      <p class="byline">Written by Dina Helmy</p>
-    </div>
-    <a class="begin" href="chapter-1.html">Begin reading</a>
-  </footer>
+  <h1 class="book">
+    <img src="img/cover.jpg" alt="Second Home. A psychological thriller by Dina Helmy.">
+    <span class="flicker" aria-hidden="true"></span>
+    <span class="drip" aria-hidden="true" style="--x:76%;--y:57%;--w:2px;--h:42px;--d:8s;--delay:1.5s"></span>
+    <span class="drip" aria-hidden="true" style="--x:84%;--y:30%;--w:2px;--h:30px;--d:7s;--delay:4s"></span>
+    <span class="drip" aria-hidden="true" style="--x:65%;--y:63%;--w:1.5px;--h:22px;--d:9s;--delay:6s"></span>
+  </h1>
+  <a class="begin" href="chapter-1.html">Begin reading</a>
 </main>
+
 <script src="motion.js"></script>
 <script>
   // Start the cover's intro once it is on screen.

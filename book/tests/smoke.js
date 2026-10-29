@@ -53,8 +53,9 @@ function check(ok, msg) {
   await p.goto('file://' + path.join(root, 'index.html'));
   const href = await p.getAttribute('a.begin', 'href').catch(() => null);
   check(href === 'chapter-1.html', `cover link goes to chapter-1.html (got ${href})`);
-  const credit = await p.textContent('body').catch(() => '');
-  check(credit.includes('D.H.') && credit.includes('Written by Dina Helmy'), 'cover shows author credits');
+  const alt = await p.getAttribute('.book img', 'alt').catch(() => '');
+  const loaded = await p.$eval('.book img', i => i.naturalWidth).catch(() => 0);
+  check(alt.includes('Dina Helmy') && loaded > 0, 'cover image loads and credits Dina Helmy');
 
   const c = await browser.newPage();
   await c.goto('file://' + path.join(root, 'chapter-1.html'));
