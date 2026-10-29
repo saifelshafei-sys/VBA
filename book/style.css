@@ -453,6 +453,26 @@ body.paged { overflow: hidden; }
 .page .ink.green { stroke: #1f9d4c; }
 .page .hand-note { fill: var(--blood-dark); }
 .page .chapter-head .num { color: var(--blood-dark); }
+
+/* A lifted corner at the top right invites you to take hold of the page */
+.page.current::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(225deg, #07030a 0 50%, #d6c8ad 50%, #fbf5e8 72%, #eadfc8 100%);
+  box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.25);
+  border-bottom-left-radius: 3px;
+  pointer-events: none;
+  z-index: 3;
+  transform-origin: top right;
+  animation: peek 5s ease-in-out 1.5s infinite;
+}
+@keyframes peek { 0%, 70%, 100% { transform: scale(1); } 80% { transform: scale(1.6); } 90% { transform: scale(1.15); } }
+.page.current.full::after { display: none; }
+
 /* Black pages stay black: the hook, the cover and the lock screen */
 .page.dark {
   --page-bg: #000;

@@ -108,8 +108,8 @@
   // ---- Page curl ----
   // The turning page is clipped along a fold line, and the folded-over flap
   // (the back of the paper) is drawn in an SVG overlay, reflected across that line.
-  // P is where the page's top-right corner has been pulled to: (W, 0) is flat,
-  // (-W, 0) is fully turned over the spine.
+  // P is where the grabbed corner has been pulled to. For the top corner, (W, 0) is
+  // flat and (-W, 0) is fully turned over the spine; the bottom corner mirrors it.
   var SVGNS = 'http://www.w3.org/2000/svg';
   var overlay = document.createElementNS(SVGNS, 'svg');
   overlay.setAttribute('class', 'curl');
@@ -135,7 +135,7 @@
     return { W: r.width, H: r.height, left: r.left, top: r.top };
   }
 
-  // Keep the side of the polygon where keep(pt) is true (Sutherland–Hodgman, one edge).
+  // Keep the side of the polygon where f(pt) >= 0 (Sutherland–Hodgman, one edge).
   function clip(poly, f) {
     var out = [];
     for (var i = 0; i < poly.length; i++) {
@@ -151,29 +151,34 @@
   }
   function pts(poly) { return poly.map(function (p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' '); }
 
-  function draw(page, P, s) {
+  // bottom: the grabbed corner is the bottom-right one; the maths runs flipped upside down.
+  function draw(page, P, s, bottom) {
     var W = s.W, H = s.H;
-    var dx = P[0] - W, dy = P[1];
+    var fy = function (p) { return bottom ? [p[0], H - p[1]] : p; };
+    var Q = fy(P);
+    var dx = Q[0] - W, dy = Q[1];
     var len = Math.sqrt(dx * dx + dy * dy);
     if (len < 0.5) { clearCurl(page); return; }
     var nx = dx / len, ny = dy / len;
-    var mx = (W + P[0]) / 2, my = P[1] / 2;
+    var mx = (W + Q[0]) / 2, my = Q[1] / 2;
     var side = function (p) { return (p[0] - mx) * nx + (p[1] - my) * ny; };
     var rect = [[0, 0], [W, 0], [W, H], [0, H]];
-    var visible = clip(rect, side);
-    var flap = clip(rect, function (p) { return -side(p); });
-    page.style.clipPath = visible.length ? 'polygon(' + visible.map(function (p) { return p[0].toFixed(1) + 'px ' + p[1].toFixed(1) + 'px'; }).join(',') + ')' : 'polygon(0 0, 0 0, 0 0)';
-    var back = flap.map(function (p) {
+    var visible = clip(rect, side).map(fy);
+    var flapF = clip(rect, function (p) { return -side(p); });
+    var back = flapF.map(function (p) {
       var k = 2 * side(p);
-      return [p[0] - k * nx, p[1] - k * ny];
+      return fy([p[0] - k * nx, p[1] - k * ny]);
     });
+    var flap = flapF.map(fy);
+    page.style.clipPath = visible.length ? 'polygon(' + visible.map(function (p) { return p[0].toFixed(1) + 'px ' + p[1].toFixed(1) + 'px'; }).join(',') + ')' : 'polygon(0 0, 0 0, 0 0)';
     backPoly.setAttribute('points', pts(back));
     shadePoly.setAttribute('points', pts(flap));
     var L = Math.min(len, W) * 0.9;
-    gBack.setAttribute('x1', mx); gBack.setAttribute('y1', my);
-    gBack.setAttribute('x2', mx + nx * L); gBack.setAttribute('y2', my + ny * L);
-    gShade.setAttribute('x1', mx); gShade.setAttribute('y1', my);
-    gShade.setAttribute('x2', mx - nx * W * 0.35); gShade.setAttribute('y2', my - ny * W * 0.35);
+    var m = fy([mx, my]), a = fy([mx + nx * L, my + ny * L]), b = fy([mx - nx * W * 0.35, my - ny * W * 0.35]);
+    gBack.setAttribute('x1', m[0]); gBack.setAttribute('y1', m[1]);
+    gBack.setAttribute('x2', a[0]); gBack.setAttribute('y2', a[1]);
+    gShade.setAttribute('x1', m[0]); gShade.setAttribute('y1', m[1]);
+    gShade.setAttribute('x2', b[0]); gShade.setAttribute('y2', b[1]);
     overlay.style.display = 'block';
   }
   function clearCurl(page) {
@@ -181,24 +186,28 @@
     overlay.style.display = 'none';
   }
 
-  // The corner can't be pulled farther from the spine than the page is wide.
-  function limit(P, s) {
-    var d = Math.sqrt(P[0] * P[0] + P[1] * P[1]);
-    if (d > s.W) { P = [P[0] * s.W / d, P[1] * s.W / d]; }
-    return [P[0], Math.max(0, P[1])];
+  // Paper can't stretch: the corner stays within one page-width of its end of the spine,
+  // and can't be pulled past its own edge of the page.
+  function limit(P, s, bottom) {
+    var x = P[0], y = bottom ? s.H - P[1] : P[1];
+    y = Math.max(0, y);
+    var d = Math.sqrt(x * x + y * y);
+    if (d > s.W) { x = x * s.W / d; y = y * s.W / d; }
+    return [x, bottom ? s.H - y : y];
   }
 
-  function animate(page, from, to, s, done) {
+  function animate(t, from, to, done) {
+    var s = t.s;
     var dist = Math.abs(to[0] - from[0]) / (2 * s.W);
-    var dur = 250 + 650 * dist;
+    var dur = 180 + 520 * dist;
     var t0 = null;
     function frame(ts) {
       if (t0 === null) t0 = ts;
       var k = Math.min(1, (ts - t0) / dur);
-      var e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-      var lift = Math.sin(Math.PI * e) * s.H * 0.32 * dist;
-      var P = limit([from[0] + (to[0] - from[0]) * e, from[1] + (to[1] - from[1]) * e + lift], s);
-      draw(page, P, s);
+      var e = 1 - Math.pow(1 - k, 3);
+      var lift = Math.sin(Math.PI * e) * s.H * 0.18 * dist * (t.bottom ? -1 : 1);
+      var P = limit([from[0] + (to[0] - from[0]) * e, from[1] + (to[1] - from[1]) * e + lift], s, t.bottom);
+      draw(t.top, P, s, t.bottom);
       if (k < 1) requestAnimationFrame(frame); else done();
     }
     requestAnimationFrame(frame);
@@ -209,29 +218,34 @@
     if (url) location.href = forward ? url : url + '#end';
   }
 
-  function settle(page, under, keepUnder) {
-    clearCurl(page);
-    page.classList.remove('current', 'turning', 'under');
-    under.classList.remove('current', 'turning', 'under');
-    (keepUnder ? under : page).classList.add('current');
-    cur = pages.indexOf(keepUnder ? under : page);
+  function settle(t, underWins) {
+    clearCurl(t.top);
+    t.top.classList.remove('current', 'turning', 'under');
+    t.under.classList.remove('current', 'turning', 'under');
+    var now = underWins ? t.under : t.top;
+    now.classList.add('current');
+    cur = pages.indexOf(now);
     busy = false;
     remember();
   }
 
-  // Start a turn: forward folds the current page away, backward unfolds the previous page over it.
-  function begin(forward) {
+  // Start a turn: forward folds the current page away, backward brings the previous page back over it.
+  function begin(forward, bottom) {
     var n = forward ? cur + 1 : cur - 1;
     if (n < 0 || n >= pages.length) return null;
     var s = size();
-    var top = forward ? pages[cur] : pages[n];
-    var under = forward ? pages[n] : pages[cur];
-    top.classList.add('turning');
-    under.classList.add('under');
-    if (!forward) draw(top, [-s.W, 0], s);
-    return { forward: forward, top: top, under: under, s: s };
+    var t = { forward: forward, bottom: bottom, s: s,
+      top: forward ? pages[cur] : pages[n],
+      under: forward ? pages[n] : pages[cur] };
+    t.flat = [s.W, bottom ? s.H : 0];
+    t.turned = [-s.W, bottom ? s.H : 0];
+    t.top.classList.add('turning');
+    t.under.classList.add('under');
+    if (!forward) draw(t.top, t.turned, s, bottom);
+    return t;
   }
 
+  // Keyboard (and links): turn a whole page from the top corner.
   function go(n) {
     if (busy || n === cur) return;
     if (n < 0 || n >= pages.length) { leaveChapter(n >= pages.length); return; }
@@ -244,74 +258,89 @@
       return;
     }
     busy = true;
-    var t = begin(forward);
-    var W = t.s.W;
-    if (forward) {
-      animate(t.top, [W, 0], [-W, 0], t.s, function () { settle(t.top, t.under, true); });
-    } else {
-      animate(t.top, [-W, 0], [W, 0], t.s, function () { settle(t.top, t.under, false); });
-    }
+    var t = begin(forward, false);
+    if (forward) animate(t, t.flat, t.turned, function () { settle(t, true); });
+    else animate(t, t.turned, t.flat, function () { settle(t, false); });
   }
 
-  // Drag a page: the corner follows your finger. Tap: right side forward, left side back.
-  var drag = null, dragged = false;
+  // ---- Turning by hand ----
+  // Grab the page and drag: the corner nearest your finger comes away with it
+  // and settles under your fingertip as you pull. Let go past halfway, or flick,
+  // and the page finishes turning; let go early and it falls back.
+  var drag = null;
+  function local(e) {
+    var r = reader.querySelector('.page.current, .page.turning').getBoundingClientRect();
+    return [e.clientX - r.left, e.clientY - r.top];
+  }
   reader.addEventListener('pointerdown', function (e) {
     if (busy || e.button > 0 || e.target.closest('a, button')) return;
-    drag = { x: e.clientX, y: e.clientY, id: e.pointerId, turn: null };
-    dragged = false;
+    drag = { id: e.pointerId, start: local(e), turn: null, hist: [] };
   });
   reader.addEventListener('pointermove', function (e) {
     if (!drag || e.pointerId !== drag.id) return;
-    var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    var f = local(e);
+    var dx = f[0] - drag.start[0], dy = f[1] - drag.start[1];
+    drag.hist.push([e.timeStamp, f[0]]);
+    if (drag.hist.length > 6) drag.hist.shift();
     if (!drag.turn) {
-      if (Math.abs(dx) < 10 || Math.abs(dx) < Math.abs(dy)) return;
-      if (reduced) return;
-      drag.turn = begin(dx < 0);
-      if (!drag.turn) { drag = null; return; }
+      if (Math.abs(dx) < 6 || Math.abs(dx) < Math.abs(dy) * 0.8) return;
+      var forward = dx < 0;
+      var s = size();
+      if (forward ? cur >= pages.length - 1 : cur <= 0) {
+        drag = null;
+        leaveChapter(forward);
+        return;
+      }
+      if (reduced) { drag = null; go(forward ? cur + 1 : cur - 1); return; }
+      drag.turn = begin(forward, drag.start[1] > s.H * 0.55);
       busy = true;
-      dragged = true;
-      try { reader.setPointerCapture(e.pointerId); } catch (err) { /* not needed */ }
+      drag.from = forward ? drag.turn.flat : drag.turn.turned;
+      try { reader.setPointerCapture(e.pointerId); } catch (err) { /* capture is optional */ }
     }
-    var s = drag.turn.s, P;
-    if (drag.turn.forward) {
-      P = [s.W + dx * 1.6, Math.max(0, dy) * 0.6 + (-dx) * 0.08];
-    } else {
-      P = [-s.W + dx * 2.2, Math.max(0, dy) * 0.6 + Math.max(0, s.W - dx) * 0.04];
-    }
-    drag.P = limit(P, s);
-    draw(drag.turn.top, drag.P, s);
+    var t = drag.turn, sz = t.s;
+    // The corner starts where it is and slides under the finger over the first part of the pull.
+    var pull = Math.min(1, Math.abs(dx) / (sz.W * 0.35));
+    var ease = pull * pull * (3 - 2 * pull);
+    var P = [
+      f[0] + (drag.from[0] - drag.start[0]) * (1 - ease),
+      f[1] + (drag.from[1] - drag.start[1]) * (1 - ease)
+    ];
+    drag.P = limit(P, sz, t.bottom);
+    draw(t.top, drag.P, sz, t.bottom);
   });
   function endDrag(e) {
     if (!drag || e.pointerId !== drag.id) return;
-    var t = drag.turn, P = drag.P;
+    var t = drag.turn, P = drag.P, h = drag.hist;
     drag = null;
-    if (!t || !P) return;
+    if (!t) return;
+    if (!P) { settle(t, !t.forward); return; }
     var W = t.s.W;
-    var complete = t.forward ? P[0] < W * 0.55 : P[0] > -W * 0.45;
-    var target = (t.forward === complete) ? [-W, 0] : [W, 0];
-    animate(t.top, P, target, t.s, function () {
-      // forward+complete or backward+cancelled: the under page wins
-      settle(t.top, t.under, t.forward === complete);
+    var v = 0;
+    if (h.length > 1) {
+      var a = h[0], b = h[h.length - 1];
+      v = (b[1] - a[1]) / Math.max(1, b[0] - a[0]); // px per ms, negative = leftward
+    }
+    var turnedOver = P[0] < 0;
+    if (v < -0.5) turnedOver = true;
+    if (v > 0.5) turnedOver = false;
+    animate(t, P, turnedOver ? t.turned : t.flat, function () {
+      // When the page ends up turned over, the page beneath it is the one you're reading.
+      settle(t, turnedOver);
     });
   }
   reader.addEventListener('pointerup', endDrag);
   reader.addEventListener('pointercancel', endDrag);
 
+  // Links inside pages still work; in-book links (#name) turn to their page.
   reader.addEventListener('click', function (e) {
-    if (dragged) { dragged = false; return; }
-    var link = e.target.closest('a, button');
-    if (link) {
-      var href = link.getAttribute('href') || '';
-      if (href.charAt(0) === '#' && href.length > 1) {
-        var target = document.getElementById(href.slice(1));
-        e.preventDefault();
-        if (target) pages.forEach(function (p, i) { if (p.contains(target)) go(i); });
-      }
-      return;
+    var link = e.target.closest('a');
+    if (!link) return;
+    var href = link.getAttribute('href') || '';
+    if (href.charAt(0) === '#' && href.length > 1) {
+      var target = document.getElementById(href.slice(1));
+      e.preventDefault();
+      if (target) pages.forEach(function (p, i) { if (p.contains(target)) go(i); });
     }
-    if (window.getSelection && String(window.getSelection()).length) return;
-    var s = size();
-    go(e.clientX - s.left > s.W * 0.35 ? cur + 1 : cur - 1);
   });
 
   document.addEventListener('keydown', function (e) {
@@ -342,7 +371,7 @@
     if (!reduced && cur === 0) {
       var hint = document.createElement('div');
       hint.className = 'turn-hint';
-      hint.textContent = 'Tap the right side or swipe to turn the page';
+      hint.textContent = 'Drag the page from the right edge to turn it';
       body.appendChild(hint);
       setTimeout(function () { hint.remove(); }, 5200);
     }

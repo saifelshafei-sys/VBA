@@ -86,6 +86,21 @@ function check(ok, msg) {
     check(after === before + 1, `${ch} arrow key turns the page (${before} -> ${after})`);
     await r.close();
   }
+  // Turning by hand: drag past halfway turns, a short drag falls back, a tap does nothing
+  const d = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await d.goto('file://' + path.join(root, 'chapter-1.html') + '#p2');
+  await d.waitForSelector('.page.current');
+  await d.waitForTimeout(500);
+  await d.mouse.move(370, 120); await d.mouse.down(); await d.mouse.move(40, 260, { steps: 15 }); await d.mouse.up();
+  await d.waitForTimeout(1000);
+  check(await d.evaluate(() => location.hash) === '#p3', 'dragging the page across turns it');
+  await d.mouse.move(370, 200); await d.mouse.down(); await d.mouse.move(320, 220, { steps: 30 }); await d.mouse.up();
+  await d.waitForTimeout(1000);
+  check(await d.evaluate(() => location.hash) === '#p3', 'a short drag lets the page fall back');
+  await d.mouse.click(330, 400); await d.waitForTimeout(1000);
+  check(await d.evaluate(() => location.hash) === '#p3', 'a tap does not turn the page');
+  await d.close();
+
   const last = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await last.goto('file://' + path.join(root, 'chapter-1.html') + '#end');
   await last.waitForSelector('.page.current');
