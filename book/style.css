@@ -311,6 +311,126 @@ html.js .ending.is-in .notice { transform: none; opacity: 1; }
 }
 .next a { color: var(--blood); text-decoration: none; }
 
+
+/* ---------- Page-turning reader (book.js) ---------- */
+body.paged { overflow: hidden; }
+.reader {
+  position: fixed;
+  inset: 0;
+  perspective: 2200px;
+  background: radial-gradient(ellipse at 50% 50%, #241027, #07030a 80%);
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: pan-y;
+}
+.page {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: min(100%, 680px);
+  display: none;
+  background: var(--night);
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+  transform-origin: left center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+/* The spine: a soft shadow down the left edge, like a bound page */
+.page::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 18px;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.45), transparent);
+  pointer-events: none;
+  z-index: 2;
+}
+/* Shading that darkens a page as it turns */
+.page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.1));
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+.reader.measuring .page { display: block; visibility: hidden; }
+.page.current { display: block; z-index: 2; }
+.page.under { display: block; z-index: 1; }
+.page.turn-out { display: block; z-index: 3; animation: turn-out 0.7s cubic-bezier(.45, .05, .55, .95) forwards; }
+.page.turn-out::after { animation: shade-in 0.7s ease forwards; }
+.page.turn-in { display: block; z-index: 3; animation: turn-in 0.7s cubic-bezier(.45, .05, .55, .95) forwards; }
+.page.turn-in::after { animation: shade-out 0.7s ease forwards; }
+@keyframes turn-out { from { transform: rotateY(0); } to { transform: rotateY(-100deg); } }
+@keyframes turn-in  { from { transform: rotateY(-100deg); } to { transform: rotateY(0); } }
+@keyframes shade-in  { to { opacity: 1; } }
+@keyframes shade-out { from { opacity: 1; } to { opacity: 0; } }
+
+.page-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 2.4rem;
+  overflow-y: auto;
+  padding-top: max(1.8rem, env(safe-area-inset-top, 0px));
+  padding-bottom: 0.5rem;
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+}
+.paged .page-inner article { padding: 0; max-width: 34rem; }
+.paged .page-inner article p { opacity: 1; transform: none; }
+.paged .page.full .page-inner > [data-reveal] { transform: none; }
+.paged .page-inner > .break { margin: 1.5rem 0; }
+.folio {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: max(0.7rem, env(safe-area-inset-bottom, 0px));
+  text-align: center;
+  font-family: var(--display);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* Whole-page blocks fill their page */
+.page.full .page-inner { padding: 0; bottom: 0; overflow: hidden; display: flex; flex-direction: column; }
+.page.full .page-inner > * { min-height: 100%; height: 100%; margin: 0; box-sizing: border-box; overflow: hidden; }
+.page.full .page-inner > .phone { height: auto; min-height: 0; margin: auto; flex: none; }
+.paged .scene svg { width: auto; max-width: min(440px, 92%); max-height: 62vh; max-height: 62dvh; }
+.paged .cover .book { width: auto; height: min(70vh, 640px); height: min(70dvh, 640px); max-width: 92%; }
+.paged .nav-page, .paged nav.next { background: transparent; padding: 2rem 0; }
+
+.turn-hint {
+  position: fixed;
+  left: 50%;
+  bottom: calc(3rem + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 20;
+  max-width: calc(100% - 48px);
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  background: rgba(242, 235, 239, 0.12);
+  color: var(--paper);
+  font-family: var(--display);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: center;
+  pointer-events: none;
+  animation: hint 5.2s ease forwards;
+}
+@keyframes hint { 0%, 100% { opacity: 0; } 10%, 80% { opacity: 1; } }
+
 /* ---------- Everyone who asks for less motion gets none ---------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

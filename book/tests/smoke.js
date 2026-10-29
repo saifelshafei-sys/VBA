@@ -67,6 +67,32 @@ function check(ok, msg) {
   await c1.goto('file://' + path.join(root, 'chapter-1.html'));
   check(await c1.$('a[href="chapter-2.html"]') !== null, 'chapter 1 links to chapter 2');
 
+  // Page-turning reader on an iPhone-sized screen
+  for (const ch of ['index.html', 'chapter-1.html', 'chapter-2.html']) {
+    const r = await browser.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true });
+    await r.goto('file://' + path.join(root, ch));
+    await r.waitForSelector('.page.current');
+    const info = await r.evaluate(() => {
+      const pages = [...document.querySelectorAll('.page')];
+      const over = pages.filter(p => { p.style.display = 'block'; const i = p.firstChild; const o = i.scrollHeight > i.clientHeight + 1; p.style.display = ''; return o; }).length;
+      return { n: pages.length, over };
+    });
+    check(info.n >= 2, `${ch} paged into ${info.n} pages`);
+    check(info.over === 0, `${ch} no page overflows (${info.over} overflow)`);
+    const before = await r.$$eval('.page', ps => ps.findIndex(p => p.classList.contains('current')));
+    await r.keyboard.press('ArrowRight');
+    await r.waitForTimeout(900);
+    const after = await r.$$eval('.page', ps => ps.findIndex(p => p.classList.contains('current')));
+    check(after === before + 1, `${ch} arrow key turns the page (${before} -> ${after})`);
+    await r.close();
+  }
+  const last = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await last.goto('file://' + path.join(root, 'chapter-1.html') + '#end');
+  await last.waitForSelector('.page.current');
+  await last.waitForTimeout(300);
+  await Promise.all([last.waitForNavigation().catch(() => null), last.keyboard.press('ArrowRight')]);
+  check(/chapter-2\.html(#p1)?$/.test(last.url()), `last page of chapter 1 turns into chapter 2 (${last.url().split('/').pop()})`);
+
   await browser.close();
   console.log(failures ? `\n${failures} failure(s)` : '\nall passed');
   process.exit(failures ? 1 : 0);
