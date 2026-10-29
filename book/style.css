@@ -1,0 +1,264 @@
+/* Second Home — shared look and motion */
+:root {
+  --night: #1a0a1d;
+  --plum: #3b1240;
+  --violet: #8e2c95;
+  --blood: #d3232f;
+  --blood-dark: #8f101b;
+  --paper: #f2ebef;
+  --muted: #b9a7bd;
+  --screen: #0d0f14;
+  --display: "Oswald", "Arial Narrow", Impact, sans-serif;
+  --serif: "Lora", Georgia, "Times New Roman", serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; }
+
+body {
+  background: var(--night);
+  color: var(--paper);
+  font-family: var(--serif);
+  line-height: 1.75;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+
+svg { max-width: 100%; height: auto; display: block; }
+
+/* ---------- Scroll reveal (hidden only when JS is running) ---------- */
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+html.js [data-reveal].is-in { opacity: 1; transform: none; }
+
+/* Lines that are lies: a one-time red/violet glitch */
+[data-glitch] { display: inline; }
+html.js .is-in [data-glitch],
+html.js [data-glitch].is-in {
+  animation: glitch 0.7s steps(2, end) 0.6s 2;
+}
+@keyframes glitch {
+  0%   { text-shadow: 2px 0 var(--blood), -2px 0 var(--violet); transform: translateX(1px); }
+  25%  { text-shadow: -3px 0 var(--blood), 3px 0 #2ce0e8; transform: translateX(-2px); filter: blur(0.4px); }
+  50%  { text-shadow: 1px 0 var(--blood), -1px 0 var(--violet); transform: skewX(-6deg); }
+  75%  { text-shadow: none; transform: translateX(2px); }
+  100% { text-shadow: none; transform: none; filter: none; }
+}
+
+/* Clues: a faint shimmer that only sharp-eyed readers notice */
+[data-clue] {
+  background: linear-gradient(100deg, var(--paper) 0%, var(--paper) 42%, #ffd3d7 50%, var(--paper) 58%, var(--paper) 100%);
+  background-size: 300% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 7s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0%, 70% { background-position: 100% 0; }
+  100%    { background-position: 0% 0; }
+}
+
+/* ---------- Reading layout ---------- */
+.chapter-head {
+  min-height: 92vh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 4rem 16px;
+  background:
+    radial-gradient(ellipse at 50% 35%, rgba(142, 44, 149, 0.45), transparent 60%),
+    var(--night);
+}
+.chapter-head .num {
+  font-family: var(--display);
+  font-size: clamp(5rem, 28vw, 11rem);
+  line-height: 1;
+  color: var(--blood);
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+.chapter-head .who {
+  font-family: var(--display);
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0.5rem 0 0;
+  padding-left: 0.5em;
+}
+.chapter-head .scroll-hint {
+  margin-top: 3rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  animation: bob 2.4s ease-in-out infinite;
+}
+@keyframes bob { 50% { transform: translateY(6px); opacity: 0.6; } }
+
+article {
+  max-width: 38rem;
+  margin: 0 auto;
+  padding: 2rem 16px 4rem;
+  font-size: clamp(1.05rem, 2.6vw, 1.2rem);
+}
+article p { margin: 0 0 1.3em; }
+article .beat {
+  font-family: var(--display);
+  font-size: clamp(1.6rem, 6vw, 2.2rem);
+  line-height: 1.25;
+  color: var(--paper);
+  margin: 2.2em 0;
+  letter-spacing: 0.02em;
+}
+article .break {
+  text-align: center;
+  color: var(--blood);
+  letter-spacing: 1em;
+  padding-left: 1em;
+  margin: 3rem 0;
+}
+
+/* ---------- The phone ---------- */
+.phone {
+  width: min(280px, 82vw);
+  margin: 3rem auto;
+  padding: 14px 12px 22px;
+  border-radius: 34px;
+  background: #050507;
+  border: 2px solid #2b2430;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 0 6px #120d14;
+}
+.phone .notch {
+  width: 38%;
+  height: 16px;
+  margin: 0 auto 10px;
+  border-radius: 0 0 12px 12px;
+  background: #000;
+}
+.phone .screen {
+  background: var(--screen);
+  border-radius: 22px;
+  padding: 14px 12px 18px;
+  min-height: 300px;
+  font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+.phone .status {
+  display: flex;
+  justify-content: space-between;
+  color: #9aa0ab;
+  font-size: 0.75rem;
+  margin-bottom: 14px;
+}
+.phone .contact {
+  text-align: center;
+  color: #e8e8ec;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.phone .contact span {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 6px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6c6f7a, #3a3c44);
+  font-size: 1.1rem;
+}
+.bubble {
+  background: #2a2c33;
+  color: #f1f1f4;
+  padding: 9px 13px;
+  border-radius: 18px 18px 18px 6px;
+  margin: 0 0 10px;
+  max-width: 88%;
+}
+.bubble.photo {
+  padding: 6px;
+  background: #2a2c33;
+}
+.phone.buzz.is-in { animation: buzz 0.12s linear 0.4s 8; }
+@keyframes buzz {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  25% { transform: translateX(-3px) rotate(-1deg); }
+  75% { transform: translateX(3px) rotate(1deg); }
+}
+
+/* Clock graphic */
+.clock {
+  font-family: var(--display);
+  font-size: clamp(3.5rem, 18vw, 6rem);
+  text-align: center;
+  color: #46e07a;
+  text-shadow: 0 0 18px rgba(70, 224, 122, 0.55);
+  letter-spacing: 0.08em;
+  margin: 2.5rem 0;
+}
+html.js .clock.is-in { animation: blink 1s steps(1) 1s 3; }
+@keyframes blink { 50% { opacity: 0.15; } }
+
+/* Ending: the last message lights up in the dark */
+.ending {
+  min-height: 90vh;
+  display: grid;
+  place-items: center;
+  padding: 4rem 16px;
+  background: #000;
+}
+.ending .lock {
+  width: min(300px, 86vw);
+  text-align: center;
+  font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #e9e9ee;
+}
+.ending .lock .time {
+  font-size: 4rem;
+  font-weight: 200;
+  margin: 0;
+}
+.ending .notice {
+  margin-top: 2rem;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.12);
+  text-align: left;
+  font-size: 0.95rem;
+}
+.ending .notice b { display: block; font-size: 0.8rem; color: #a7a7b0; font-weight: 500; }
+html.js .ending .lock { opacity: 0; transition: opacity 2.5s ease 0.8s; }
+html.js .ending.is-in .lock { opacity: 1; }
+html.js .ending .notice { transform: translateY(-30px); opacity: 0; transition: all 0.6s cubic-bezier(.2,1.4,.4,1) 3.4s; }
+html.js .ending.is-in .notice { transform: none; opacity: 1; }
+
+.next {
+  text-align: center;
+  padding: 3rem 16px 5rem;
+  background: #000;
+  color: var(--muted);
+  font-family: var(--display);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+.next a { color: var(--blood); text-decoration: none; }
+
+/* ---------- Everyone who asks for less motion gets none ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  html.js [data-reveal],
+  html.js .ending .lock,
+  html.js .ending .notice { opacity: 1; transform: none; }
+}
