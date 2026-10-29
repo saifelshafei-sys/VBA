@@ -48,3 +48,25 @@
 
   targets.forEach(function (el) { io.observe(el); });
 })();
+
+// Scenes slowly push in and darken as they scroll past (sets --p from 0 to 1).
+(function () {
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var scenes = document.querySelectorAll('[data-scene]');
+  if (!scenes.length) return;
+  var ticking = false;
+  function update() {
+    var vh = window.innerHeight;
+    scenes.forEach(function (s) {
+      var r = s.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > vh) return;
+      var p = Math.min(1, Math.max(0, (vh - r.top) / (vh + r.height)));
+      s.style.setProperty('--p', p.toFixed(3));
+    });
+    ticking = false;
+  }
+  window.addEventListener('scroll', function () {
+    if (!ticking) { ticking = true; requestAnimationFrame(update); }
+  }, { passive: true });
+  update();
+})();

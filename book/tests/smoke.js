@@ -19,7 +19,9 @@ function check(ok, msg) {
       const page = await browser.newPage({ viewport: size });
       const errors = [];
       page.on('pageerror', e => errors.push(e.message));
-      page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+      // Images may be absent until the artwork is added; any other failed file is a real error.
+      page.on('console', m => { if (m.type() === 'error' && !m.text().startsWith('Failed to load resource')) errors.push(m.text()); });
+      page.on('requestfailed', r => { if (!['image', 'font', 'stylesheet'].includes(r.resourceType()) || /style\.css$/.test(r.url())) errors.push('failed ' + r.url()); });
       const res = await page.goto(url).catch(e => { errors.push(e.message); return null; });
       check(res !== null, `${file} @${size.width} loads`);
       await page.waitForTimeout(300);
@@ -41,8 +43,9 @@ function check(ok, msg) {
     const pn = await ctxNoJs.newPage();
     await pn.goto(url);
     await pn.waitForTimeout(2500); // cover intro fades in via CSS, which runs without JS
-    const invisible = await pn.$$eval('p', els => els.filter(e => getComputedStyle(e).opacity === '0' || getComputedStyle(e).visibility === 'hidden').length);
-    check(invisible === 0, `${file} no JS: all paragraphs visible (${invisible} invisible)`);
+    const invisibleList = await pn.$$eval('p', els => els.filter(e => getComputedStyle(e).opacity === '0' || getComputedStyle(e).visibility === 'hidden').map(e => e.className || e.textContent.slice(0, 30)));
+    const invisible = invisibleList.length + (invisibleList.length ? ' ' + invisibleList.join(', ') : '');
+    check(invisibleList.length === 0, `${file} no JS: all paragraphs visible (${invisible} invisible)`);
     await ctxNoJs.close();
   }
 
