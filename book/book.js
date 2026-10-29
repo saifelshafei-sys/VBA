@@ -60,6 +60,7 @@
       if (b.full) {
         var fp = newPage();
         fp.classList.add('full');
+        if (b.el.matches('section.ending, section.coldopen, main.cover')) fp.classList.add('dark');
         fp.firstChild.appendChild(b.el);
         fp._first = b.el;
         page = null;
@@ -116,8 +117,8 @@
   overlay.innerHTML =
     '<defs>' +
     '<linearGradient id="curl-back" gradientUnits="userSpaceOnUse">' +
-    '<stop offset="0" stop-color="#5a3a62"/><stop offset="0.12" stop-color="#3e2245"/>' +
-    '<stop offset="0.6" stop-color="#2b1430"/><stop offset="1" stop-color="#1f0d23"/></linearGradient>' +
+    '<stop offset="0" stop-color="#d9ccb2"/><stop offset="0.12" stop-color="#fbf5e8"/>' +
+    '<stop offset="0.6" stop-color="#efe4cd"/><stop offset="1" stop-color="#dccdb0"/></linearGradient>' +
     '<linearGradient id="curl-shade" gradientUnits="userSpaceOnUse">' +
     '<stop offset="0" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>' +
     '</defs>' +

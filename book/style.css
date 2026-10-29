@@ -11,6 +11,9 @@
   --screen: #0d0f14;
   --chalk: #efe6d8;
   --lcd: #46e07a;
+  --text: #f2ebef;
+  --shine: #ffd3d7;
+  --page-bg: #1a0a1d;
   --display: "Oswald", "Arial Narrow", Impact, sans-serif;
   --serif: "Lora", Georgia, "Times New Roman", serif;
 }
@@ -21,7 +24,7 @@ html, body { margin: 0; }
 
 body {
   background: var(--night);
-  color: var(--paper);
+  color: var(--text);
   font-family: var(--serif);
   line-height: 1.75;
   overflow-x: hidden;
@@ -56,7 +59,7 @@ html.js [data-glitch].is-in {
 
 /* Clues: a faint shimmer that only sharp-eyed readers notice */
 [data-clue] {
-  background: linear-gradient(100deg, var(--paper) 0%, var(--paper) 42%, #ffd3d7 50%, var(--paper) 58%, var(--paper) 100%);
+  background: linear-gradient(100deg, var(--text) 0%, var(--text) 42%, var(--shine) 50%, var(--text) 58%, var(--text) 100%);
   background-size: 300% 100%;
   background-position: 100% 0;
   -webkit-background-clip: text;
@@ -117,7 +120,7 @@ article .beat {
   font-family: var(--display);
   font-size: clamp(1.6rem, 6vw, 2.2rem);
   line-height: 1.25;
-  color: var(--paper);
+  color: var(--text);
   margin: 2.2em 0;
   letter-spacing: 0.02em;
 }
@@ -215,7 +218,7 @@ article .break {
   line-height: 1.1;
   text-align: center;
   margin: 0;
-  color: var(--paper);
+  color: var(--text);
 }
 
 /* Pen lines */
@@ -225,7 +228,7 @@ article .break {
 .ink.red { stroke: var(--blood); }
 .ink.green { stroke: var(--lcd); }
 .boil { filter: url(#boil); }
-.occlude { fill: var(--night); }
+.occlude { fill: var(--page-bg); }
 
 /* Things that wake up once the drawing is finished */
 .later { opacity: 0; transition: opacity 0.9s ease; }
@@ -332,7 +335,7 @@ body.paged { overflow: hidden; }
   margin: 0 auto;
   width: min(100%, 680px);
   display: none;
-  background: var(--night);
+  background-color: var(--page-bg);
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
   transform-origin: left center;
   backface-visibility: hidden;
@@ -416,8 +419,8 @@ body.paged { overflow: hidden; }
   max-width: calc(100% - 48px);
   padding: 0.6rem 1rem;
   border-radius: 999px;
-  background: rgba(242, 235, 239, 0.12);
-  color: var(--paper);
+  background: rgba(43, 32, 35, 0.82);
+  color: #f4ecdb;
   font-family: var(--display);
   font-size: 0.75rem;
   letter-spacing: 0.12em;
@@ -427,6 +430,39 @@ body.paged { overflow: hidden; }
   animation: hint 5.2s ease forwards;
 }
 @keyframes hint { 0%, 100% { opacity: 0; } 10%, 80% { opacity: 1; } }
+
+/* ---------- Cream paper: the pages of the book ---------- */
+.page {
+  --page-bg: #f4ecdb;
+  --text: #2b2023;
+  --chalk: #2e2629;
+  --shine: #c8141f;
+  --muted: #8a7768;
+  color: var(--text);
+  background-image:
+    radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(120, 88, 48, 0.16) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.35 0 0 0 0 0.2 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.page::before { background: linear-gradient(to right, rgba(90, 64, 30, 0.28), transparent); }
+.page .scene,
+.page .chapter-head { background: transparent; }
+.page .ink.thin { opacity: 0.85; }
+.page .ink.hair { opacity: 0.6; }
+.page .glow { fill: #9fd3f2; }
+.page .lcd { fill: #1f9d4c; }
+.page .ink.green { stroke: #1f9d4c; }
+.page .hand-note { fill: var(--blood-dark); }
+.page .chapter-head .num { color: var(--blood-dark); }
+/* Black pages stay black: the hook, the cover and the lock screen */
+.page.dark {
+  --page-bg: #000;
+  --text: #f2ebef;
+  --chalk: #efe6d8;
+  --shine: #ffd3d7;
+  --muted: #b9a7bd;
+  background-image: none;
+}
+.page.dark::before { background: linear-gradient(to right, rgba(0, 0, 0, 0.45), transparent); }
 
 /* ---------- Everyone who asks for less motion gets none ---------- */
 @media (prefers-reduced-motion: reduce) {
