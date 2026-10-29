@@ -3,7 +3,7 @@ const { chromium } = require('playwright');
 const path = require('path');
 
 const root = path.resolve(__dirname, '..');
-const pages = ['index.html', 'chapter-1.html'];
+const pages = ['index.html', 'chapter-1.html', 'chapter-2.html'];
 const sizes = [{ width: 375, height: 812 }, { width: 1280, height: 800 }];
 let failures = 0;
 
@@ -57,10 +57,15 @@ function check(ok, msg) {
   const loaded = await p.$eval('.book img', i => i.naturalWidth).catch(() => 0);
   check(alt.includes('Dina Helmy') && loaded > 0, 'cover image loads and credits Dina Helmy');
 
-  const c = await browser.newPage();
-  await c.goto('file://' + path.join(root, 'chapter-1.html'));
-  const words = await c.$$eval('article p', els => els.map(e => e.textContent).join(' ').split(/\s+/).filter(Boolean).length);
-  check(words >= 1700, `chapter 1 length ~2,000 words (got ${words})`);
+  for (const ch of ['chapter-1.html', 'chapter-2.html']) {
+    const c = await browser.newPage();
+    await c.goto('file://' + path.join(root, ch));
+    const words = await c.$$eval('article p', els => els.map(e => e.textContent).join(' ').split(/\s+/).filter(Boolean).length);
+    check(words >= 1700, `${ch} length ~2,000 words (got ${words})`);
+  }
+  const c1 = await browser.newPage();
+  await c1.goto('file://' + path.join(root, 'chapter-1.html'));
+  check(await c1.$('a[href="chapter-2.html"]') !== null, 'chapter 1 links to chapter 2');
 
   await browser.close();
   console.log(failures ? `\n${failures} failure(s)` : '\nall passed');
