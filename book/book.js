@@ -371,7 +371,7 @@
     if (!reduced && cur === 0) {
       var hint = document.createElement('div');
       hint.className = 'turn-hint';
-      hint.textContent = 'Drag the page from the right edge to turn it';
+      hint.textContent = 'Drag left to turn the page, right to go back';
       body.appendChild(hint);
       setTimeout(function () { hint.remove(); }, 5200);
     }

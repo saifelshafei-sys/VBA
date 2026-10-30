@@ -97,6 +97,12 @@ function check(ok, msg) {
   await d.mouse.move(370, 200); await d.mouse.down(); await d.mouse.move(320, 220, { steps: 30 }); await d.mouse.up();
   await d.waitForTimeout(1000);
   check(await d.evaluate(() => location.hash) === '#p3', 'a short drag lets the page fall back');
+  await d.mouse.move(200, 420); await d.mouse.down(); await d.mouse.move(380, 410, { steps: 12 }); await d.mouse.up();
+  await d.waitForTimeout(1000);
+  check(await d.evaluate(() => location.hash) === '#p2', 'dragging right from mid-page turns back');
+  await d.mouse.move(200, 420); await d.mouse.down(); await d.mouse.move(20, 430, { steps: 12 }); await d.mouse.up();
+  await d.waitForTimeout(1000);
+  check(await d.evaluate(() => location.hash) === '#p3', 'dragging left from mid-page turns forward');
   await d.mouse.click(330, 400); await d.waitForTimeout(1000);
   check(await d.evaluate(() => location.hash) === '#p3', 'a tap does not turn the page');
   await d.close();
