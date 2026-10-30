@@ -305,12 +305,13 @@
       f[0] + (drag.from[0] - drag.start[0]) * (1 - ease),
       f[1] + (drag.from[1] - drag.start[1]) * (1 - ease)
     ];
+    drag.dx = dx;
     drag.P = limit(P, sz, t.bottom);
     draw(t.top, drag.P, sz, t.bottom);
   });
   function endDrag(e) {
     if (!drag || e.pointerId !== drag.id) return;
-    var t = drag.turn, P = drag.P, h = drag.hist;
+    var t = drag.turn, P = drag.P, h = drag.hist, moved = drag.dx || 0;
     drag = null;
     if (!t) return;
     if (!P) { settle(t, !t.forward); return; }
@@ -320,9 +321,11 @@
       var a = h[0], b = h[h.length - 1];
       v = (b[1] - a[1]) / Math.max(1, b[0] - a[0]); // px per ms, negative = leftward
     }
-    var turnedOver = P[0] < 0;
-    if (v < -0.5) turnedOver = true;
-    if (v > 0.5) turnedOver = false;
+    // Decide by how far the finger travelled (a third of the page) or a flick,
+    // not by where the corner ended up: paper held low can't reach far, but the hand did.
+    var turnedOver = t.forward ? !(moved > -W * 0.33) : moved < W * 0.33;
+    if (v < -0.4) turnedOver = true;
+    if (v > 0.4) turnedOver = false;
     animate(t, P, turnedOver ? t.turned : t.flat, function () {
       // When the page ends up turned over, the page beneath it is the one you're reading.
       settle(t, turnedOver);

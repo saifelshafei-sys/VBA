@@ -107,6 +107,23 @@ function check(ok, msg) {
   check(await d.evaluate(() => location.hash) === '#p3', 'a tap does not turn the page');
   await d.close();
 
+  // Real finger swipes (touch events, as on an iPhone) must keep turning page after page
+  const tctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const tp = await tctx.newPage();
+  await tp.goto('file://' + path.join(root, 'chapter-1.html'));
+  await tp.waitForSelector('.page.current');
+  await tp.waitForTimeout(500);
+  const cdp = await tctx.newCDPSession(tp);
+  const touch = (type, x, y) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y }] });
+  for (let k = 0; k < 8; k++) {
+    await touch('touchStart', 250, 420);
+    for (let i = 1; i <= 12; i++) { await touch('touchMove', 250 - 210 * i / 12, 420 + 20 * i / 12); await tp.waitForTimeout(16); }
+    await touch('touchEnd');
+    await tp.waitForTimeout(1000);
+  }
+  check(await tp.evaluate(() => location.hash) === '#p9', `8 finger swipes turn 8 pages (at ${await tp.evaluate(() => location.hash)})`);
+  await tctx.close();
+
   const last = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await last.goto('file://' + path.join(root, 'chapter-1.html') + '#end');
   await last.waitForSelector('.page.current');

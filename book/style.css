@@ -326,6 +326,8 @@ body.paged { overflow: hidden; }
   user-select: none;
   touch-action: none;
 }
+/* Finger drags anywhere in the book turn the page; nothing inside it scrolls. */
+.reader * { touch-action: none; }
 .page {
   position: absolute;
   top: 0;
@@ -379,7 +381,7 @@ body.paged { overflow: hidden; }
   left: 0;
   right: 0;
   bottom: 2.4rem;
-  overflow-y: auto;
+  overflow: hidden;
   padding-top: max(1.8rem, env(safe-area-inset-top, 0px));
   padding-bottom: 0.5rem;
   padding-left: max(24px, env(safe-area-inset-left, 0px));
