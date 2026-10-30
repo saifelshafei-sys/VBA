@@ -6,7 +6,8 @@
 <title>Second Home — Dina Helmy</title>
 <meta name="description" content="Second Home, a psychological thriller by Dina Helmy (D.H.).">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Oswald:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap">
+<link rel="stylesheet" href="design-system/dramatic-tokens.css">
 <link rel="stylesheet" href="style.css">
 <style>
   /* Cold open: one line on black before the cover */
@@ -15,22 +16,23 @@
     display: grid;
     place-items: center;
     padding: 2rem 16px;
-    background: #000;
+    background: var(--lights-out);
     text-align: center;
   }
   .coldopen .line {
     max-width: 30rem;
     font-size: clamp(1.35rem, 5.4vw, 2rem);
     line-height: 1.5;
-    font-style: italic;
+    color: var(--fg-2);
     margin: 0;
   }
-  .coldopen .line .red { color: var(--blood); font-style: normal; font-family: var(--display); letter-spacing: 0.03em; }
+  .coldopen .line .red { color: var(--blood); font-family: var(--display); font-weight: 900; letter-spacing: var(--tracking-display); }
   .coldopen .down {
     display: block;
     margin-top: 3rem;
     color: var(--muted);
     font-family: var(--display);
+    font-weight: 600;
     letter-spacing: 0.3em;
     font-size: 0.8rem;
     text-transform: uppercase;
@@ -51,7 +53,7 @@
     justify-content: center;
     gap: 1.6rem;
     padding: 2rem 16px 3rem;
-    background: radial-gradient(ellipse at 50% 40%, #3b1240 0%, #000 75%);
+    background: radial-gradient(ellipse at 50% 40%, color-mix(in oklab, var(--accent), var(--bg) 70%) 0%, var(--lights-out) 75%);
   }
   .book {
     position: relative;
@@ -60,8 +62,8 @@
     margin: 0;
     overflow: hidden;
     border-radius: 3px 6px 6px 3px;
-    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.75);
-    background: #000;
+    box-shadow: var(--elev-raised);
+    background: var(--lights-out);
   }
   .book img {
     display: block;
@@ -76,7 +78,7 @@
   .book .flicker {
     position: absolute;
     inset: 0;
-    background: #000;
+    background: var(--lights-out);
     opacity: 0;
     pointer-events: none;
     animation: flicker 7s steps(1) 2s infinite;
@@ -95,7 +97,7 @@
     width: var(--w, 4px);
     height: 0;
     border-radius: 0 0 4px 4px;
-    background: linear-gradient(rgba(110, 6, 16, 0.6), #8e0d18);
+    background: linear-gradient(color-mix(in oklab, var(--blood-deep), transparent 40%), var(--blood-deep));
     animation: run var(--d, 6s) cubic-bezier(.5, 0, .7, 1) var(--delay, 0s) infinite;
   }
   .drip::after {
@@ -107,7 +109,7 @@
     height: calc(var(--w, 4px) + 3px);
     transform: translateX(-50%);
     border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-    background: #8e0d18;
+    background: var(--blood-deep);
   }
   @keyframes run {
     0%   { height: 0; opacity: 0; }
@@ -124,16 +126,21 @@
   .begin {
     display: inline-block;
     padding: 0.85rem 2.2rem;
-    border: 1px solid var(--paper);
-    border-radius: 999px;
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-pill);
+    background: var(--accent);
+    color: var(--accent-on);
     font-family: var(--display);
+    font-weight: 600;
     letter-spacing: 0.3em;
     text-transform: uppercase;
     text-decoration: none;
     font-size: 0.9rem;
-    transition: background 0.3s, color 0.3s;
+    transition: background var(--motion-base) var(--ease-standard), box-shadow var(--motion-base) var(--ease-standard);
   }
-  .begin:hover, .begin:focus-visible { background: var(--paper); color: var(--night); }
+  .begin:hover { background: var(--accent-hover); }
+  .begin:active { background: var(--accent-active); }
+  .begin:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 
   @media (prefers-reduced-motion: reduce) {
     .drip { display: none; }

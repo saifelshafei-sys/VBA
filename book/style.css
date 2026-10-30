@@ -1,18 +1,32 @@
-/* Second Home — shared look and motion */
+/* Second Home — shared look and motion.
+ * Built on Open Design's Dramatic system (design-system/dramatic-tokens.css,
+ * loaded first). Its DESIGN.md names violet and rose accents and Outfit type,
+ * so those replace the package's blue/Inter token defaults here. */
 :root {
   color-scheme: dark;
-  --night: #1a0a1d;
-  --plum: #3b1240;
-  --violet: #8e2c95;
-  --blood: #d3232f;
-  --blood-dark: #8f101b;
-  --paper: #f2ebef;
-  --muted: #b9a7bd;
-  --screen: #0d0f14;
-  --chalk: #efe6d8;
-  --lcd: #46e07a;
-  --display: "Oswald", "Arial Narrow", Impact, sans-serif;
-  --serif: "Lora", Georgia, "Times New Roman", serif;
+  --accent: #8b5cf6;
+  --accent-on: #ffffff;
+  --secondary: #f43f5e;
+  --focus-ring: 0 0 0 4px rgba(139, 92, 246, 0.35);
+  --font-display: "Outfit", system-ui, sans-serif;
+  --font-body: "Outfit", system-ui, sans-serif;
+  --font-hand: "Caveat", cursive;
+
+  /* Story props that the system has no token for */
+  --chalk: #efe6d8;   /* pen lines in the sketches */
+  --lcd: #46e07a;     /* the microwave clock */
+  --blood-deep: color-mix(in oklab, var(--secondary), black 55%);
+  --lights-out: #000; /* moments the room goes fully dark */
+
+  /* The book's own names, mapped onto the system */
+  --night: var(--bg);
+  --plum: var(--surface-warm);
+  --violet: var(--accent);
+  --blood: var(--secondary);
+  --paper: var(--fg);
+  --screen: var(--surface);
+  --display: var(--font-display);
+  --serif: var(--font-body);
 }
 
 * { box-sizing: border-box; }
@@ -23,6 +37,7 @@ body {
   background: var(--night);
   color: var(--paper);
   font-family: var(--serif);
+  font-weight: 400;
   line-height: 1.75;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -56,7 +71,7 @@ html.js [data-glitch].is-in {
 
 /* Clues: a faint shimmer that only sharp-eyed readers notice */
 [data-clue] {
-  background: linear-gradient(100deg, var(--paper) 0%, var(--paper) 42%, #ffd3d7 50%, var(--paper) 58%, var(--paper) 100%);
+  background: linear-gradient(100deg, var(--paper) 0%, var(--paper) 42%, color-mix(in oklab, var(--secondary), white 70%) 50%, var(--paper) 58%, var(--paper) 100%);
   background-size: 300% 100%;
   background-position: 100% 0;
   -webkit-background-clip: text;
@@ -77,19 +92,21 @@ html.js [data-glitch].is-in {
   text-align: center;
   padding: 4rem 16px;
   background:
-    radial-gradient(ellipse at 50% 35%, rgba(142, 44, 149, 0.45), transparent 60%),
+    radial-gradient(ellipse at 50% 35%, color-mix(in oklab, var(--accent), transparent 62%), transparent 60%),
     var(--night);
 }
 .chapter-head .num {
   font-family: var(--display);
+  font-weight: 900;
   font-size: clamp(5rem, 28vw, 11rem);
-  line-height: 1;
+  line-height: var(--leading-tight);
   color: var(--blood);
-  letter-spacing: 0.04em;
+  letter-spacing: var(--tracking-display);
   margin: 0;
 }
 .chapter-head .who {
   font-family: var(--display);
+  font-weight: 600;
   letter-spacing: 0.5em;
   text-transform: uppercase;
   color: var(--muted);
@@ -115,11 +132,12 @@ article {
 article p { margin: 0 0 1.3em; }
 article .beat {
   font-family: var(--display);
+  font-weight: 900;
   font-size: clamp(1.6rem, 6vw, 2.2rem);
-  line-height: 1.25;
+  line-height: 1.2;
   color: var(--paper);
   margin: 2.2em 0;
-  letter-spacing: 0.02em;
+  letter-spacing: var(--tracking-display);
 }
 article .break {
   text-align: center;
@@ -206,11 +224,11 @@ article .break {
   align-content: center;
   gap: 1rem;
   padding: 3rem 16px;
-  background: radial-gradient(ellipse at 50% 42%, #2a0f2e 0%, var(--night) 70%);
+  background: radial-gradient(ellipse at 50% 42%, var(--surface-warm) 0%, var(--night) 70%);
 }
 .scene svg { width: min(440px, 92vw); }
 .scene-line {
-  font-family: "Caveat", cursive;
+  font-family: var(--font-hand);
   font-size: clamp(2.2rem, 10vw, 3.4rem);
   line-height: 1.1;
   text-align: center;
@@ -241,7 +259,7 @@ article .break {
 .buzz { transform-box: fill-box; transform-origin: center; }
 .on .buzz { animation: buzz 0.09s linear 0.2s 12; }
 @keyframes buzz { 25% { transform: rotate(-2deg) translateX(-2px); } 75% { transform: rotate(2deg) translateX(2px); } }
-.hand-note { font-family: "Caveat", cursive; fill: var(--blood); font-size: 22px; }
+.hand-note { font-family: var(--font-hand); fill: var(--blood); font-size: 22px; }
 .lcd { font-family: var(--display); fill: var(--lcd); letter-spacing: 1px; }
 .on .lcd { filter: drop-shadow(0 0 6px var(--lcd)); animation: blink 1s steps(1) 0.4s 4; }
 .steam { stroke-dasharray: 14 10; }
@@ -258,8 +276,8 @@ article .break {
   font-family: var(--display);
   font-size: clamp(3.5rem, 18vw, 6rem);
   text-align: center;
-  color: #46e07a;
-  text-shadow: 0 0 18px rgba(70, 224, 122, 0.55);
+  color: var(--lcd);
+  text-shadow: 0 0 18px color-mix(in oklab, var(--lcd), transparent 45%);
   letter-spacing: 0.08em;
   margin: 2.5rem 0;
 }
@@ -272,7 +290,7 @@ html.js .clock.is-in { animation: blink 1s steps(1) 1s 3; }
   display: grid;
   place-items: center;
   padding: 4rem 16px;
-  background: #000;
+  background: var(--lights-out);
 }
 .ending .lock {
   width: min(300px, 86vw);
@@ -302,14 +320,16 @@ html.js .ending.is-in .notice { transform: none; opacity: 1; }
 .next {
   text-align: center;
   padding: 3rem 16px 5rem;
-  background: #000;
+  background: var(--lights-out);
   color: var(--muted);
   font-family: var(--display);
+  font-weight: 600;
   letter-spacing: 0.25em;
   text-transform: uppercase;
   font-size: 0.85rem;
 }
-.next a { color: var(--blood); text-decoration: none; }
+.next a { color: var(--blood); text-decoration: none; border-radius: var(--radius-sm); }
+.next a:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 
 /* ---------- Everyone who asks for less motion gets none ---------- */
 @media (prefers-reduced-motion: reduce) {
