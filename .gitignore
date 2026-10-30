@@ -14,6 +14,8 @@ bundled/
 .claude/*
 !.claude/agents/
 !.claude/settings.json
+!.claude/setup/
+!.claude/skills/
 .vscode/
 .idea/
 *.swp
