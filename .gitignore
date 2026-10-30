@@ -11,7 +11,8 @@ build/.bundled/
 bundled/
 
 # IDE and Editor Files
-.claude/
+.claude/*
+!.claude/agents/
 .vscode/
 .idea/
 *.swp
