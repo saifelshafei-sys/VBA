@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Explainer</title>
+<style>
+  :root {
+    --bg: #0f1115; --ink: #f3f1ea; --muted: #9aa0a8;
+    --accent: #f2a23a; --accent-2: #5fb3a1; --grid: #262a31;
+    --font: "Inter", "Helvetica Neue", Arial, "Noto Sans SC", "PingFang SC", sans-serif;
+  }
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
+  #stage { position: relative; width: 1920px; height: 1080px; font-family: var(--font); color: var(--ink); }
+  .abs { position: absolute; will-change: transform, opacity; }
+  .kicker { left: 160px; top: 150px; font-size: 30px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+  .title  { left: 160px; top: 200px; font-size: 104px; font-weight: 700; line-height: 1.05; max-width: 1500px; }
+  .chart  { left: 160px; top: 520px; width: 1600px; height: 320px; }
+  .row    { position: absolute; left: 0; height: 110px; width: 1600px; }
+  .label  { position: absolute; left: 0; top: 30px; width: 300px; font-size: 40px; color: var(--muted); }
+  .track  { position: absolute; left: 320px; top: 20px; width: 1100px; height: 70px; border-radius: 10px; background: var(--grid); }
+  .bar    { position: absolute; left: 0; top: 0; height: 70px; border-radius: 10px; }
+  .value  { position: absolute; left: 1450px; top: 22px; font-size: 52px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .takeaway { left: 160px; top: 930px; font-size: 50px; font-weight: 600; }
+  .takeaway b { color: var(--accent); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="abs kicker" id="kicker">Q3 pricing review</div>
+  <div class="abs title" id="title">Annual plans keep customers 2.4× longer</div>
+  <div class="abs chart" id="chart"></div>
+  <div class="abs takeaway" id="takeaway">Default the toggle to <b>annual</b>.</div>
+</div>
+<script>
+// ---- Timing helpers: everything is a pure function of t (seconds). ----
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const progress = (t, start, dur) => clamp((t - start) / dur);       // 0 → 1 over [start, start+dur]
+const easeOut = (p) => 1 - Math.pow(1 - p, 3);
+const easeInOut = (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
+const lerp = (a, b, p) => a + (b - a) * p;
+// Fade + rise in at `start`, optional fade out at `end`.
+function enter(el, t, start, { dur = 0.6, rise = 40, end = Infinity, outDur = 0.4 } = {}) {
+  const pin = easeOut(progress(t, start, dur));
+  const pout = progress(t, end, outDur);
+  el.style.opacity = pin * (1 - pout);
+  el.style.transform = `translateY(${lerp(rise, 0, pin) - 20 * pout}px)`;
+}
+
+// ---- Content: edit these, not the render code. ----
+const DATA = [
+  { label: 'Monthly', value: 5.1, unit: ' mo', color: 'var(--muted)' },
+  { label: 'Annual',  value: 12.3, unit: ' mo', color: 'var(--accent)' },
+];
+const MAX = 14;
+
+// ---- Beat sheet (seconds) ----
+const BEATS = {
+  kicker: 0.2, title: 0.5,
+  chart: 2.6, rowStagger: 0.5, grow: 1.6,
+  takeaway: 6.6, end: 10,
+};
+window.EXPLAINER = { duration: BEATS.end, width: 1920, height: 1080 };
+
+// Build static DOM once.
+const chart = document.getElementById('chart');
+const rows = DATA.map((d, i) => {
+  const row = document.createElement('div');
+  row.className = 'row'; row.style.top = `${i * 150}px`;
+  row.innerHTML = `<div class="label">${d.label}</div>
+    <div class="track"><div class="bar" style="background:${d.color}"></div></div>
+    <div class="value"></div>`;
+  chart.appendChild(row);
+  return { row, bar: row.querySelector('.bar'), value: row.querySelector('.value'), d };
+});
+const $ = (id) => document.getElementById(id);
+
+window.renderFrame = (t) => {
+  enter($('kicker'), t, BEATS.kicker);
+  enter($('title'), t, BEATS.title, { dur: 0.8 });
+
+  rows.forEach(({ row, bar, value, d }, i) => {
+    const start = BEATS.chart + i * BEATS.rowStagger;
+    enter(row, t, start, { dur: 0.5, rise: 30 });
+    const g = easeInOut(progress(t, start + 0.3, BEATS.grow));
+    bar.style.width = `${(d.value / MAX) * 1100 * g}px`;
+    value.textContent = (d.value * g).toFixed(1) + d.unit;
+  });
+
+  enter($('takeaway'), t, BEATS.takeaway, { dur: 0.7 });
+};
+
+// Live preview when opened in a browser (the renderer ignores this; it calls renderFrame itself).
+if (!navigator.webdriver) {
+  const t0 = performance.now();
+  const loop = () => { window.renderFrame(((performance.now() - t0) / 1000) % EXPLAINER.duration); requestAnimationFrame(loop); };
+  requestAnimationFrame(loop);
+} else {
+  window.renderFrame(0);
+}
+</script>
+</body>
+</html>
