@@ -311,6 +311,84 @@ html.js .ending.is-in .notice { transform: none; opacity: 1; }
 }
 .next a { color: var(--blood); text-decoration: none; }
 
+/* ---------- Marquee (ported from Magic UI) ---------- */
+/* Without JS the items sit wrapped and still; motion.js clones the group and adds .is-running. */
+.marquee {
+  --gap: 2.5rem;
+  --duration: 40s;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem var(--gap);
+  width: 100%;
+  overflow: hidden;
+  padding: 0.6rem 0;
+  font-family: var(--display);
+  font-size: 0.8rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.marquee__group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem var(--gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.marquee__group li { white-space: nowrap; }
+.marquee__group li::before { content: "\2022"; color: var(--blood); margin-right: var(--gap); }
+.marquee.is-running {
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+.marquee.is-running .marquee__group {
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  justify-content: space-around;
+  animation: marquee var(--duration) linear infinite;
+}
+.marquee.is-running:hover .marquee__group { animation-play-state: paused; }
+@keyframes marquee { to { transform: translateX(calc(-100% - var(--gap))); } }
+
+/* ---------- Shimmer button (ported from Magic UI) ---------- */
+/* A spark of blood light runs round the edge; ::after is the button face. */
+.shimmer {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: transparent;
+  box-shadow: 0 0 22px rgba(211, 35, 47, 0.25);
+}
+.shimmer::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  top: 50%;
+  left: 50%;
+  width: 150%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: conic-gradient(from 0deg, var(--blood-dark) 0deg, transparent 60deg, transparent 290deg, var(--blood) 340deg, #ffd3d7 360deg);
+  animation: shimmer-spin 3s linear infinite;
+}
+.shimmer::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 1.5px;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at 50% 0%, #3a1018, #120614 70%);
+  box-shadow: inset 0 -6px 12px rgba(255, 211, 215, 0.08);
+  transition: background 0.3s;
+}
+.shimmer:hover::after, .shimmer:focus-visible::after { background: var(--paper); }
+@keyframes shimmer-spin { to { rotate: 1turn; } }
+
 /* ---------- Everyone who asks for less motion gets none ---------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -321,4 +399,5 @@ html.js .ending.is-in .notice { transform: none; opacity: 1; }
   html.js [data-reveal],
   html.js .ending .lock,
   html.js .ending .notice { opacity: 1; transform: none; }
+  .shimmer { border-color: var(--blood); }
 }

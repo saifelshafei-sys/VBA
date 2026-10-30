@@ -70,3 +70,17 @@
   }, { passive: true });
   update();
 })();
+
+// Marquee: repeat the group so the strip loops without a seam (Magic UI repeats it 4 times).
+(function () {
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('[data-marquee]').forEach(function (m) {
+    var group = m.querySelector('.marquee__group');
+    for (var i = 0; i < 3; i++) {
+      var copy = group.cloneNode(true);
+      copy.setAttribute('aria-hidden', 'true');
+      m.appendChild(copy);
+    }
+    m.classList.add('is-running');
+  });
+})();
