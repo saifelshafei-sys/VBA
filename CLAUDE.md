@@ -40,6 +40,6 @@ Plugins installed mid-session may need `/reload-plugins` before their commands a
 - `claude plugin install rea@rea` (6.8.0) reports success but installs no npm
   dependencies and no MCP launcher, so the server never starts. The restore script
   installs `rea-agents` from npm and registers it with `claude mcp add --scope local`.
-- REA does not extract or analyse VBA macros in `.xlsm` files; use `olevba`
-  (`oletools`) for that. Native binary analysis also needs Ghidra, Hopper, IDA or
-  Kuna, which are not installed.
+- Native binary analysis (for example the built NSIS installer, the macOS `.pkg`
+  or the picker app) needs Ghidra, Hopper, IDA or Kuna, which are not installed.
+  Static JavaScript, .NET and website analysis work without them.
