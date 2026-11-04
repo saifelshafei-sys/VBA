@@ -19,7 +19,6 @@ It installs:
 | `cli-anything-hub` | pip package | `cli-hub list / search / install <name>` for ready-made CLIs |
 | `cli-hub-meta-skill` | Skill | Also committed in `.claude/skills/`, so it loads for this repo without the script |
 | `cli-anything-libreoffice` | pip package, patched | Build and export spreadsheets, documents and slides through headless LibreOffice |
-| `rea-agents` (REA) | npm package + MCP server | Reverse-engineer binaries, .NET assemblies, Electron/JS apps and websites; registered as the `rea` MCP server for this repo |
 
 Plugins installed mid-session may need `/reload-plugins` before their commands appear.
 
@@ -34,12 +33,3 @@ Plugins installed mid-session may need `/reload-plugins` before their commands a
   `soffice --headless --convert-to csv`; the harness's own tests don't catch this.
 - It builds workbooks cell by cell from a `.lo-cli.json` project file. It does not
   open `.xlsm` files or run VBA macros.
-
-## Known issues with REA
-
-- `claude plugin install rea@rea` (6.8.0) reports success but installs no npm
-  dependencies and no MCP launcher, so the server never starts. The restore script
-  installs `rea-agents` from npm and registers it with `claude mcp add --scope local`.
-- REA does not extract or analyse VBA macros in `.xlsm` files; use `olevba`
-  (`oletools`) for that. Native binary analysis also needs Ghidra, Hopper, IDA or
-  Kuna, which are not installed.

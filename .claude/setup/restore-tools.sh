@@ -60,23 +60,6 @@ rm -rf "$src"
 command -v soffice >/dev/null ||
   echo "warning: LibreOffice (soffice) is not installed; the CLI needs it"
 
-step "REA reverse-engineering MCP server"
-# The rea@rea plugin from REA's own marketplace installs without its npm
-# dependencies or MCP launcher (6.8.0), so install the npm package and
-# register its MCP server for this repo only (local scope, not .mcp.json).
-REA_VERSION=6.8.0
-repo_root=$(cd "$(dirname "$0")/../.." && pwd)
-if npm install -q --global --prefix "$HOME/.local" "rea-agents@$REA_VERSION"; then
-  rea_entry=$(readlink -f "$HOME/.local/bin/rea")
-  (cd "$repo_root" &&
-    { claude mcp remove --scope local rea >/dev/null 2>&1 || true; } &&
-    claude mcp add --scope local rea -- "$(command -v node)" "$rea_entry" mcp) || fail=1
-  mkdir -p "$HOME/.claude/skills" &&
-    cp -r "$(dirname "$rea_entry")/../skills/reverse-engineer-anything" "$HOME/.claude/skills/" || fail=1
-else
-  fail=1
-fi
-
 if [ "$fail" -ne 0 ]; then
   echo; echo "Some steps failed; see output above." >&2
   exit 1
